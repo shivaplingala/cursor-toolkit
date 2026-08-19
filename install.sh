@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install Cursor Toolkit: plugins + skills + rules.
-# Usage: bash install.sh | bash install.sh --check | bash install.sh --pack
+# Usage: bash install.sh | bash install.sh --check | bash install.sh --deps | bash install.sh --pack
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
@@ -27,8 +27,9 @@ usage() {
   cat <<EOF
 Cursor Toolkit installer
 
-  bash install.sh              install plugins, skills, rules
-  bash install.sh --check      verify install on this machine
+  bash install.sh              install plugins, skills, rules + host links
+  bash install.sh --deps       install CLIs (boto3, whisper, graphify, headroom, ruflo)
+  bash install.sh --check      verify files + CLIs/MCP
   bash install.sh --pack       refresh this repo from ~/.cursor (owner)
 
 Then reload Cursor.
@@ -70,8 +71,14 @@ install_rules() {
 run_host_installers() {
   local fcd="$DEST/full-cycle-delivery"
   local v2="$DEST/fcd-v2"
+  local gt="$DEST/global-tooling"
   [[ -f "$fcd/scripts/install-multi-agent.sh" ]] && bash "$fcd/scripts/install-multi-agent.sh"
   [[ -f "$v2/scripts/install-symlinks.sh" ]] && bash "$v2/scripts/install-symlinks.sh"
+  [[ -f "$gt/scripts/install-multi-agent.sh" ]] && bash "$gt/scripts/install-multi-agent.sh"
+}
+
+run_deps() {
+  bash "$ROOT/scripts/deps.sh" "$1"
 }
 
 check_install() {
@@ -79,12 +86,14 @@ check_install() {
   for name in "${PLUGINS[@]}"; do
     [[ -f "$DEST/$name/.cursor-plugin/plugin.json" ]] || { echo "FAIL plugin $name"; ok=1; }
   done
-  [[ -f "$SKILLS/full-cycle-delivery/SKILL.md" || -f "$SKILLS/grill-me/SKILL.md" ]] || {
-    echo "WARN skills may be incomplete"
-  }
+  for name in grill-me grill-with-docs research-agent backend frontend qa playwright-qa; do
+    [[ -f "$SKILLS/$name/SKILL.md" ]] || { echo "FAIL skill $name"; ok=1; }
+  done
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {
     echo "WARN rules may be incomplete"
   }
+  echo
+  bash "$ROOT/scripts/deps.sh" --check || ok=1
   return "$ok"
 }
 
@@ -110,6 +119,7 @@ pack_from_local() {
 
 case "${1:-}" in
   --check) check_install ;;
+  --deps)  run_deps --install ;;
   --pack)  pack_from_local ;;
   -h|--help) usage ;;
   "")
@@ -117,7 +127,11 @@ case "${1:-}" in
     install_skills
     install_rules
     run_host_installers
-    echo "Done. Reload Cursor."
+    echo
+    bash "$ROOT/scripts/deps.sh" --check || true
+    echo
+    echo "Done. Install missing CLIs with: bash install.sh --deps"
+    echo "Then reload Cursor."
     ;;
   *) echo "unknown: $1" >&2; usage; exit 1 ;;
 esac
