@@ -1,0 +1,24 @@
+---
+description: >-
+  When delivering features, channels, bug fixes, packages, workflow, or infra
+  (especially serverless-monorepo), or when the user wants plan→build→verify→ship
+  with human plan approval, follow the global full-cycle-delivery skill.
+  Prefer /full-cycle-delivery. Phase 4–5 must run coding + impact review-fix
+  until 0 findings.
+alwaysApply: false
+---
+
+# Full-cycle delivery (global)
+
+Skill root (prefer in order):
+
+1. `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery`
+2. `~/.cursor/skills/full-cycle-delivery`
+3. `<repo>/.claude/skills/full-cycle-delivery` (optional workspace override)
+
+- Phases 2–3: **grill-me** then **grill-with-docs** before plan approval
+- No Phase 4 without explicit plan approval
+- After approval: stay on full-cycle-delivery (playbooks, verify-scope, review prompts)
+- Review-fix: coding-reviewer + impact-reviewer → fix until both `FINDING_COUNT: 0`
+- No autonomous prod deploy or PR merge
+- Pair **research-agent** when external/provider docs are needed

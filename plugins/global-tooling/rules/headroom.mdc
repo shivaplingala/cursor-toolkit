@@ -1,0 +1,14 @@
+---
+description: Use Headroom MCP to compress large tool outputs across all projects
+alwaysApply: true
+---
+
+# Headroom (global)
+
+Compress large tool dumps via MCP before deep reasoning. Config is user-global (`~/.cursor/mcp.json`, `~/.cursor/skills/headroom/`).
+
+- Large grep/logs/JSON/shell dumps → `headroom_compress`
+- Need detail from a hash marker → `headroom_retrieve` (optional `query`)
+- Savings questions → `headroom_stats`
+- Skip short outputs and the single file being actively edited
+- Default Cursor models: MCP only (no HTTP proxy). BYOK OpenAI Base URL: `http://127.0.0.1:8787/v1` after `headroom-cursor` / `headroom proxy`

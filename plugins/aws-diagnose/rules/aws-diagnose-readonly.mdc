@@ -1,0 +1,18 @@
+---
+description: >-
+  When diagnosing AWS or SST issues (or after /aws-diagnose), keep all AWS
+  access read-only via the diagnose WRAP and write findings to
+  .aws-details/reports/.
+alwaysApply: false
+---
+
+# AWS diagnose — read-only
+
+- Use the skill WRAP only: `python "$SKILL_ROOT/scripts/aws_read.py" …`. Never raw mutating CLI/SDK.
+- Do not guess Lambda names, log groups, or SSM paths — run `scan_sst.py` first.
+- Write reports only under `.aws-details/reports/`. Redact tokens and sensitive bodies.
+- Suggest fixes; never apply them in-account.
+- Missing intake → ask once, then stop.
+- AgentCore issues → `references/agentcore-handoff.md`, then `/agents-debug` /
+  `/agents-build` / `/agents-optimize` / `/agents-harden` (mutating steps only
+  after leaving diagnose).

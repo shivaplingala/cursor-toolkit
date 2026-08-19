@@ -1,0 +1,22 @@
+{
+  "name": "global-tooling",
+  "displayName": "Global Tooling (Headroom · Ruflo)",
+  "version": "1.0.0",
+  "description": "Global Headroom (context compression) and Ruflo (multi-agent orchestration) skills, slash commands, and multi-agent install links. Canonical skills under ~/.cursor/skills; MCP via headroom/ruflo CLIs.",
+  "author": {
+    "name": "Toolkit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "headroom",
+    "ruflo",
+    "compression",
+    "swarm",
+    "mcp",
+    "global-tooling"
+  ],
+  "category": "developer-tools",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "rules": "./rules/"
+}

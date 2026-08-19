@@ -1,0 +1,31 @@
+---
+description: Keep codebase docs (CODE_DETAILS.md / CODEBASE_MAP.md) in sync with source
+alwaysApply: true
+---
+
+# Codebase docs are auto-maintained
+
+This repo keeps machine-readable code docs next to the source:
+
+- `CODEBASE_MAP.md` — navigation: which folder holds what.
+- `CODE_DETAILS.md` — per-folder reference of every function, class, interface,
+  enum, and type under that folder's `src/`, written so a small model can find
+  things without reasoning.
+
+`.codedocs/pending.json` lists packages whose docs are stale after recent edits.
+
+## What to do
+
+After you add, change, or delete code under any `src/`, before finishing your
+turn run the updater:
+
+1. `node .codedocs/diff.mjs --apply` to refresh the maps and write an
+   incremental `.codedocs/plan.json` (which `CODE_DETAILS.md` files to rewrite).
+2. For each package in `plan.json`'s `detailDocsToWrite`, read the listed source
+   files and rewrite that `CODE_DETAILS.md` following the existing template.
+   Delete any doc listed in `detailDocsToDelete`.
+3. `node .codedocs/diff.mjs --commit` to mark the new state as documented, then
+   clear the entries you handled from `.codedocs/pending.json`.
+
+Keep entries terse and lookup-first: a "Quick lookup" table at the top, then one
+short block per symbol (what it does, when to use it, params, returns).

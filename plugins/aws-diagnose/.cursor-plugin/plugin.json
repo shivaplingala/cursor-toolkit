@@ -1,0 +1,29 @@
+{
+  "name": "aws-diagnose",
+  "displayName": "AWS Diagnose",
+  "version": "1.1.0",
+  "description": "Read-only AWS/SST diagnostics for serverless projects, plus bundled Bedrock AgentCore skills (debug, build, optimize, harden). Evidence → diagnose → report; AgentCore handoff for agent-specific work.",
+  "author": {
+    "name": "Toolkit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "aws",
+    "diagnostics",
+    "readonly",
+    "sst",
+    "cloudwatch",
+    "serverless",
+    "troubleshoot",
+    "agentcore",
+    "bedrock",
+    "agents-debug",
+    "agents-build",
+    "agents-optimize",
+    "agents-harden"
+  ],
+  "category": "developer-tools",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "rules": "./rules/"
+}

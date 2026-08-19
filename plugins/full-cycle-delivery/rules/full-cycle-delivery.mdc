@@ -1,0 +1,21 @@
+---
+description: >-
+  When delivering features, channels, bug fixes, packages, workflow, or infra
+  in serverless-monorepo (or when the user wants plan→build→verify→ship with
+  human plan approval), read and follow the full-cycle-delivery skill before
+  implementing. Prefer /full-cycle-delivery over ad-hoc coding. Phase 4–5 must
+  run coding + impact review-fix until 0 findings.
+alwaysApply: false
+---
+
+# Full-cycle delivery — use the gated pipeline
+
+Skill is **global** (plugin + `~/.cursor/skills/full-cycle-delivery`). Prefer plugin path over any workspace copy.
+
+- For delivery work, load **full-cycle-delivery** first.
+- Phases 2–3 require **grill-me** then **grill-with-docs** before plan approval.
+- No Phase 4 without explicit plan approval.
+- After approval, stay on full-cycle-delivery — do not freestyle.
+- **Review-fix loop:** coding-reviewer + impact-reviewer until both `FINDING_COUNT: 0`.
+- No autonomous prod deploy or PR merge.
+- Pair with **research-agent** when external docs are needed.

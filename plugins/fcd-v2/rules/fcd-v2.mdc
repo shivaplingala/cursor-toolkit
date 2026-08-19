@@ -1,0 +1,17 @@
+---
+description: >-
+  Optional: when user asks for FCD-V2 /fcd-v2 (not classic /full-cycle-delivery),
+  load skill fcd-v2. Never rewrite or replace the FCD v1 plugin.
+alwaysApply: false
+---
+
+# FCD-V2 (agent-requestable)
+
+If the user invokes **`/fcd-v2`** or asks for **FCD-V2** / FCD+Ruflo orchestration:
+
+1. Load skill **`fcd-v2`** (`~/.cursor/plugins/local/fcd-v2/skills/fcd-v2`)
+2. Keep classic **`/full-cycle-delivery`** untouched — user decides which command to use
+3. Phase 4: escalate check → classic or swarm protocol
+4. Always preserve FCD iron laws (grill, plan approval, dual review to 0, no autonomous prod)
+
+Do not treat this rule as a reason to change FCD v1 behavior.

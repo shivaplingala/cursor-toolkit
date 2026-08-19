@@ -1,0 +1,20 @@
+---
+description: >-
+  Global tooling router: Headroom (compress), Ruflo (swarm/memory), 
+  full-cycle-delivery (gated ship). Check availability then use the right one.
+alwaysApply: true
+---
+
+# Global tooling — pick and use
+
+Installs are user-global. Load skill **cursor-global-tooling** for full how-to.
+
+| Need | Use | How |
+|------|-----|-----|
+| Large tool dumps / context / tokens | **Headroom** | MCP `headroom_compress` / `retrieve` / `stats` (`user-headroom`) |
+| Multi-agent swarm / shared memory | **Ruflo** | MCP `swarm_init`, `agent_*`, `memory_*` (`user-ruflo`); state `~/.ruflo` |
+| Plan→build→verify→ship with gates | **full-cycle-delivery** | `/full-cycle-delivery` or skill; grill-me → grill-with-docs → plan approval → review-fix to 0 |
+
+**Check then use:** if MCP/skill missing, say so and suggest reload / `headroom-cursor` / `ruflo-cursor`. Do not invent substitutes.
+
+**Do not:** `ruflo init` in a workspace unless asked; skip FCD plan gate; use Ruflo for one-shot edits; use Headroom on tiny outputs.

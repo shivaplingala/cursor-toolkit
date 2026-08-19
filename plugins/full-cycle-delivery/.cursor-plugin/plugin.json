@@ -1,0 +1,26 @@
+{
+  "name": "full-cycle-delivery",
+  "displayName": "Full-Cycle Delivery",
+  "version": "1.7.1",
+  "description": "Global gated delivery pipeline: intake \u2192 research \u2192 grill \u2192 plan approval \u2192 implement \u2192 dual code review (coding + codebase impact) with fix-until-zero \u2192 verify \u2192 ship. Canonical under ~/.cursor/plugins/local; install-multi-agent.sh links Claude/Codex/Antigravity/OpenCode/Kilo/Kimi (+ GLM via Claude).",
+  "author": {
+    "name": "Toolkit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "serverless",
+    "delivery",
+    "full-cycle-delivery",
+    "plan",
+    "verify",
+    "code-review",
+    "impact-review",
+    "grill-me",
+    "ship"
+  ],
+  "category": "developer-tools",
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "rules": "./rules/",
+  "agents": "./agents/"
+}
