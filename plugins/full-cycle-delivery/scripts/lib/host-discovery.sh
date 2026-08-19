@@ -1,16 +1,36 @@
 #!/usr/bin/env bash
 # Shared host-discovery helpers for FCD / FCD-V2 / global-tooling installers.
-# Source only — do not execute. ADR: docs/agent-host-discovery/
+# Source only — do not execute. Linux / macOS / Windows Git Bash (not cmd.exe).
+# ADR: docs/agent-host-discovery/
 #
 # shellcheck shell=bash
 # Usage: source "$PLUGIN_ROOT/../full-cycle-delivery/scripts/lib/host-discovery.sh"
 # Or:    source "$(dirname "$0")/lib/host-discovery.sh"  (from FCD plugin)
 
+# GNU readlink -f is missing on macOS; cmd.exe has no bash. Python realpath works everywhere we have Python.
+hd_realpath() {
+  local p="$1"
+  if command -v python3 >/dev/null 2>&1; then
+    python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$p" 2>/dev/null && return 0
+  fi
+  if command -v python >/dev/null 2>&1; then
+    python -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$p" 2>/dev/null && return 0
+  fi
+  if command -v py >/dev/null 2>&1; then
+    py -3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "$p" 2>/dev/null && return 0
+  fi
+  if [[ -d "$p" ]]; then
+    ( cd "$p" && pwd -P )
+    return 0
+  fi
+  echo "$(cd "$(dirname "$p")" && pwd -P)/$(basename "$p")"
+}
+
 hd_copy_skill() {
   local src="$1" dest="$2"
   # Resolve symlink loops / point at real tree
   if [[ -L "$src" ]]; then
-    src="$(readlink -f "$src" 2>/dev/null || true)"
+    src="$(hd_realpath "$src" 2>/dev/null || true)"
   fi
   if [[ -z "$src" || ! -d "$src" ]]; then
     echo "skip copy (bad src): $1" >&2
@@ -21,10 +41,17 @@ hd_copy_skill() {
     rm -f "$dest"
   fi
   mkdir -p "$dest"
-  rsync -a --delete \
-    --exclude 'graphify-out/' \
-    --exclude '*.Zone.Identifier' \
-    "$src/" "$dest/"
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete \
+      --exclude 'graphify-out/' \
+      --exclude '*.Zone.Identifier' \
+      "$src/" "$dest/"
+  else
+    # ponytail: macOS/Git Bash often lack rsync; cp -R is POSIX
+    rm -rf "$dest"
+    mkdir -p "$dest"
+    cp -R "$src/." "$dest/"
+  fi
   echo "copied  $dest"
 }
 
@@ -32,11 +59,11 @@ hd_link_skill() {
   local src="$1" dest="$2"
   mkdir -p "$(dirname "$dest")"
   local want
-  want="$(readlink -f "$src" 2>/dev/null || echo "$src")"
+  want="$(hd_realpath "$src" 2>/dev/null || echo "$src")"
   # Avoid A -> B -> A loops
   if [[ -L "$dest" ]]; then
     local cur
-    cur="$(readlink -f "$dest" 2>/dev/null || true)"
+    cur="$(hd_realpath "$dest" 2>/dev/null || true)"
     if [[ -n "$cur" && "$cur" == "$want" ]]; then
       echo "ok link  $dest"
       return 0
@@ -46,7 +73,7 @@ hd_link_skill() {
     rm -f "$dest"
   elif [[ -e "$dest" ]]; then
     # If dest is a real dir that IS the canonical src, do not replace with symlink
-    if [[ "$(readlink -f "$dest" 2>/dev/null || true)" == "$want" && ! -L "$dest" ]]; then
+    if [[ "$(hd_realpath "$dest" 2>/dev/null || true)" == "$want" && ! -L "$dest" ]]; then
       echo "ok dir   $dest (canonical)"
       return 0
     fi
@@ -54,12 +81,16 @@ hd_link_skill() {
     rm -rf "$dest"
   fi
   # Never link a path to itself
-  if [[ "$(readlink -f "$(dirname "$dest")" 2>/dev/null)/$(basename "$dest")" == "$want" ]]; then
+  if [[ "$(hd_realpath "$(dirname "$dest")" 2>/dev/null)/$(basename "$dest")" == "$want" ]]; then
     echo "skip self-link $dest"
     return 0
   fi
-  ln -s "$src" "$dest"
-  echo "linked  $dest -> $src"
+  if ln -s "$src" "$dest" 2>/dev/null; then
+    echo "linked  $dest -> $src"
+  else
+    # Windows Git Bash often cannot create symlinks without Developer Mode
+    hd_copy_skill "$src" "$dest"
+  fi
 }
 
 hd_install_command() {
@@ -70,7 +101,7 @@ hd_install_command() {
     return 0
   fi
   # If dest is a symlink to src, leave it
-  if [[ -L "$dest" ]] && [[ "$(readlink -f "$dest" 2>/dev/null || true)" == "$(readlink -f "$src")" ]]; then
+  if [[ -L "$dest" ]] && [[ "$(hd_realpath "$dest" 2>/dev/null || true)" == "$(hd_realpath "$src")" ]]; then
     echo "ok cmd  $dest"
     return 0
   fi
@@ -154,7 +185,7 @@ hd_check_rule_dual() {
   if [[ ! -f "$dest_dir/${name}.md" ]]; then
     echo "CHECK FAIL missing: rules/${name}.md"
     rc=1
-  elif head -1 "$dest_dir/${name}.md" | grep -q '^---$'; then
+  elif head -n 1 "$dest_dir/${name}.md" | grep -q '^---$'; then
     echo "CHECK FAIL stripped rule still has frontmatter: rules/${name}.md"
     rc=1
   else
@@ -168,10 +199,14 @@ hd_check_skill_link() {
   local src="$1"
   local dest="$2"
   local src_r dest_r
-  src_r="$(readlink -f "$src")"
-  dest_r="$(readlink -f "$dest" 2>/dev/null || true)"
+  src_r="$(hd_realpath "$src")"
+  dest_r="$(hd_realpath "$dest" 2>/dev/null || true)"
   if [[ -n "$dest_r" && "$dest_r" == "$src_r" ]]; then
     echo "CHECK ok   link $dest"
+    return 0
+  fi
+  if [[ -d "$dest" ]] && diff -rq -x 'graphify-out' -x '*.Zone.Identifier' "$src" "$dest" >/dev/null 2>&1; then
+    echo "CHECK ok   copy $dest"
     return 0
   fi
   if [[ -d "$dest" && ! -L "$dest" ]]; then

@@ -12,12 +12,29 @@ miss() { printf '  MISS %s\n' "$1"; FAIL=1; }
 warn() { printf '  WARN %s\n' "$1"; WARN=1; }
 
 have() { command -v "$1" >/dev/null 2>&1; }
-py_mod() { python3 -c "import $1" >/dev/null 2>&1; }
+
+run_python() {
+  if have python3; then python3 "$@"
+  elif have python; then python "$@"
+  elif have py; then command py -3 "$@"
+  else return 127
+  fi
+}
+
+py_mod() { run_python -c "import $1" >/dev/null 2>&1; }
+
+toolkit_os() {
+  case "$(uname -s 2>/dev/null)" in
+    Darwin) echo mac ;;
+    MINGW*|MSYS*|CYGWIN*) echo win ;;
+    *) echo linux ;;
+  esac
+}
 
 pip_user() {
   echo "  pip  $1"
-  python3 -m pip install --user -q "$1" \
-    || python3 -m pip install --user -q --break-system-packages "$1"
+  run_python -m pip install --user -q "$1" \
+    || run_python -m pip install --user -q --break-system-packages "$1"
 }
 
 npm_g() {
@@ -36,20 +53,51 @@ ensure_uv() {
   have uv && return 0
   echo "  curl uv"
   curl -LsSf https://astral.sh/uv/install.sh | sh
-  export PATH="$HOME/.local/bin:$PATH"
+  export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
   have uv
 }
 
-try_apt() {
-  local pkg="$1"
-  dpkg -s "$pkg" >/dev/null 2>&1 && return 0
-  sudo -n apt-get install -y "$pkg" >/dev/null 2>&1
+# Linux: apt. macOS: brew. Windows Git Bash: print winget/choco hint (no silent GUI install).
+try_os_pkg() {
+  local apt_pkg="$1" brew_pkg="${2:-$1}" hint="${3:-}"
+  local os
+  os=$(toolkit_os)
+  case "$os" in
+    linux)
+      if have dpkg; then dpkg -s "$apt_pkg" >/dev/null 2>&1 && return 0; fi
+      sudo -n apt-get install -y "$apt_pkg" >/dev/null 2>&1
+      ;;
+    mac)
+      have brew || return 1
+      brew list "$brew_pkg" >/dev/null 2>&1 && return 0
+      brew install "$brew_pkg"
+      ;;
+    win)
+      return 1
+      ;;
+  esac
+}
+
+pkg_hint() {
+  local name="$1"
+  case "$(toolkit_os)" in
+    linux) echo "sudo apt install $name" ;;
+    mac) echo "brew install $name" ;;
+    win)
+      case "$name" in
+        ffmpeg) echo "winget install Gyan.FFmpeg" ;;
+        tesseract*) echo "winget install UB-Mannheim.TesseractOCR" ;;
+        jq) echo "winget install jqlang.jq" ;;
+        *) echo "winget / choco install $name" ;;
+      esac
+      ;;
+  esac
 }
 
 mcp_keys() {
   local mcp="${HOME}/.cursor/mcp.json"
   [[ -f "$mcp" ]] || { echo ""; return; }
-  python3 -c "import json,sys; print(' '.join(json.load(open(sys.argv[1])).get('mcpServers',{})))" "$mcp" 2>/dev/null || true
+  run_python -c "import json,sys; print(' '.join(json.load(open(sys.argv[1])).get('mcpServers',{})))" "$mcp" 2>/dev/null || true
 }
 
 mcp_has() {
@@ -58,8 +106,8 @@ mcp_has() {
 
 # Merge a server into ~/.cursor/mcp.json if missing. Never overwrites existing (tokens stay).
 mcp_ensure() {
-  python3 - "$1" <<'PY'
-import json, os, sys
+  run_python - "$1" <<'PY'
+import json, os, shutil, sys
 name = sys.argv[1]
 path = os.path.expanduser("~/.cursor/mcp.json")
 data = {"mcpServers": {}}
@@ -73,11 +121,10 @@ if name in data["mcpServers"]:
     raise SystemExit(0)
 
 home = os.path.expanduser("~")
-whisper = os.popen("command -v whisper").read().strip()
-headroom = os.popen("command -v headroom").read().strip() or "headroom"
-ruflo = os.popen("command -v ruflo").read().strip() or "ruflo"
-gitnexus = os.popen("command -v gitnexus").read().strip() or "gitnexus"
-node = os.popen("command -v node").read().strip() or "node"
+whisper = shutil.which("whisper") or ""
+headroom = shutil.which("headroom") or "headroom"
+ruflo = shutil.which("ruflo") or "ruflo"
+gitnexus = shutil.which("gitnexus") or "gitnexus"
 
 servers = {
     "headroom": {
@@ -137,7 +184,7 @@ check_core() {
   have bash || miss "bash"
   have git && ok "git" || miss "git"
   have rsync && ok "rsync" || warn "rsync (falls back to cp -a)"
-  have python3 && ok "python3" || miss "python3"
+  have python3 && ok "python3" || { have python && ok "python" || miss "python3 / python"; }
   have node && ok "node            (codebase-doc-*, video-analyzer npx)" || miss "node 20+ (nvm / Node.js)"
   have npm && ok "npm" || miss "npm"
   have uv && ok "uv              (graphify, headroom)" || warn "uv (https://docs.astral.sh/uv/)"
@@ -217,6 +264,7 @@ check_mcp_block() {
 }
 
 do_check() {
+  echo "os=$(toolkit_os)  (linux / mac / win=Git Bash — not cmd.exe or PowerShell)"
   check_core
   check_fcd
   check_fcd_v2
@@ -241,14 +289,14 @@ do_check() {
 }
 
 do_install() {
-  echo "=== install (idempotent) ==="
-  have python3 || { echo "install python3 first" >&2; exit 1; }
+  echo "=== install (idempotent)  os=$(toolkit_os) ==="
+  run_python -c "import sys" >/dev/null 2>&1 || { echo "install Python 3 first" >&2; exit 1; }
   ensure_uv || warn "uv install failed; pip fallback for graphify/headroom"
 
-  have ffmpeg || try_apt ffmpeg || warn "install ffmpeg (sudo apt install ffmpeg)"
-  have tesseract || try_apt tesseract-ocr || warn "install tesseract-ocr"
-  have jq || try_apt jq || warn "install jq"
-  have git || try_apt git || true
+  have ffmpeg || try_os_pkg ffmpeg ffmpeg || warn "ffmpeg: $(pkg_hint ffmpeg)"
+  have tesseract || try_os_pkg tesseract-ocr tesseract || warn "tesseract: $(pkg_hint tesseract)"
+  have jq || try_os_pkg jq jq || warn "jq: $(pkg_hint jq)"
+  have git || try_os_pkg git git || true
 
   py_mod boto3 || pip_user boto3
   py_mod whisper || pip_user openai-whisper

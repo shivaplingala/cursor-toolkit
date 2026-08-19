@@ -31,6 +31,8 @@ bash install.sh          # files + host links
 bash install.sh --deps   # CLIs used by skills (boto3, whisper, graphify, headroom, ruflo)
 ```
 
+**OS:** Linux and macOS (Terminal). Windows: **Git Bash or WSL** — not `cmd.exe` or PowerShell. `--deps` uses apt (Linux), Homebrew (macOS), or prints winget hints (Windows). If symlink creation fails (common on Windows without Developer Mode), skills are copied instead.
+
 Then **reload Cursor**.
 
 ```bash

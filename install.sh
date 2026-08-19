@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Install Cursor Toolkit: plugins + skills + rules.
+# Linux / macOS / Windows Git Bash or WSL. Not cmd.exe or PowerShell.
 # Usage: bash install.sh | bash install.sh --check | bash install.sh --deps | bash install.sh --pack
 set -euo pipefail
 
@@ -19,7 +20,7 @@ sync_tree() {
   else
     rm -rf "$dest"
     mkdir -p "$dest"
-    cp -a "$src/." "$dest/"
+    cp -R "$src/." "$dest/"
   fi
 }
 
@@ -47,6 +48,7 @@ install_plugins() {
 install_skills() {
   local name src dest
   mkdir -p "$SKILLS"
+  shopt -s nullglob
   for src in "$ROOT/skills"/*; do
     [[ -d "$src" ]] || continue
     name=$(basename "$src")
@@ -56,6 +58,7 @@ install_skills() {
     sync_tree "$src" "$dest"
     echo "skill   $dest"
   done
+  shopt -u nullglob
 }
 
 install_rules() {
@@ -63,7 +66,7 @@ install_rules() {
   local f
   for f in "$ROOT/rules"/*.mdc; do
     [[ -f "$f" ]] || continue
-    cp -a "$f" "$RULES/$(basename "$f")"
+    cp -R "$f" "$RULES/$(basename "$f")"
     echo "rule    $RULES/$(basename "$f")"
   done
 }
@@ -107,13 +110,17 @@ pack_from_local() {
     [[ -d "$name" ]] || continue
     [[ "$(basename "$name")" == "stage-mongo" ]] && continue
     if [[ -L "$name" ]]; then
-      target=$(readlink -f "$name")
+      if [[ -d "$name" ]]; then
+        target=$(cd "$name" && pwd -P)
+      else
+        target="$name"
+      fi
       sync_tree "$target" "$ROOT/skills/$(basename "$name")"
     else
       sync_tree "$name" "$ROOT/skills/$(basename "$name")"
     fi
   done
-  cp -a "$RULES"/*.mdc "$ROOT/rules/" 2>/dev/null || true
+  cp -R "$RULES"/*.mdc "$ROOT/rules/" 2>/dev/null || true
   echo "packed into $ROOT"
 }
 

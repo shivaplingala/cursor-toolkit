@@ -14,10 +14,10 @@ skill_src() {
   local name="$1"
   local p="$PLUGIN_ROOT/skills/$name"
   if [[ -L "$p" || -d "$p" ]]; then
-    readlink -f "$p"
+    hd_realpath "$p"
     return
   fi
-  readlink -f "$HOME/.cursor/skills/$name"
+  hd_realpath "$HOME/.cursor/skills/$name"
 }
 
 MODE="${1:-install}"
@@ -49,7 +49,7 @@ for name in "${SKILLS[@]}"; do
   [[ -f "$SRC/SKILL.md" ]] || { echo "missing skill: $name ($SRC)" >&2; exit 1; }
   echo "=== $name ($SRC) ==="
 
-  if [[ "$(readlink -f "$HOME/.cursor/skills/$name" 2>/dev/null || true)" != "$SRC" ]]; then
+  if [[ "$(hd_realpath "$HOME/.cursor/skills/$name" 2>/dev/null || true)" != "$SRC" ]]; then
     hd_link_skill "$SRC" "$HOME/.cursor/skills/$name"
   else
     echo "ok link  $HOME/.cursor/skills/$name"
