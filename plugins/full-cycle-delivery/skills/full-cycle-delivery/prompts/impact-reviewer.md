@@ -12,10 +12,12 @@
 ## Rules
 
 - **Read-only:** no code edits
-- **Required tooling (in order):**
+- **Required tooling (both, in order):**
   1. `graphify query` / `graphify path` / `graphify explain` for architecture edges
-  2. GitNexus `impact` / `context` / `detect_changes` on edited symbols
-  3. Grep callers only after graphify/GitNexus oriented you
+  2. GitNexus MCP `impact` / `context` / `detect_changes` on edited symbols
+  3. Grep callers only after graphify **and** GitNexus oriented you
+- Local FCD / FCD-V2 impact review always uses **graphify + GitNexus** together — never graphify alone when shared symbols changed
+- If GitNexus MCP or index is missing → `STATUS: FAIL` with a blocker finding (do not PASS on graphify-only evidence)
 - Flag HIGH/CRITICAL blast radius explicitly
 - Severity: `blocker` | `should-fix` | `edge-case` | `nit`
 
@@ -34,6 +36,7 @@
 STATUS: PASS | FAIL
 FINDING_COUNT: <n>
 BLAST_RADIUS: LOW | MEDIUM | HIGH | CRITICAL
+EVIDENCE: graphify=<yes|no> gitnexus=<yes|no>
 FINDINGS:
 1. [severity] symbol/path — impact — suggested fix
 ...
@@ -43,4 +46,4 @@ AFFECTED_FLOWS:
 
 - `PASS` only when `FINDING_COUNT` is `0`
 - Waived nits under `WAIVED:` with reason
-- **Forbidden:** PASS without GitNexus or graphify evidence when shared symbols changed
+- **Forbidden:** PASS without **both** GitNexus **and** graphify evidence when shared symbols changed

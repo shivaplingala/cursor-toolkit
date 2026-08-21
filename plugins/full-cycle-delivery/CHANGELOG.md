@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.2 — 2026-08-21
+
+- Impact reviewer requires **both** graphify and GitNexus (no graphify-only PASS when shared symbols changed); emit `EVIDENCE:` line
+
 ## 1.4.0 — 2026-08-12
 
 - Shared `scripts/lib/host-discovery.sh`; installers use it

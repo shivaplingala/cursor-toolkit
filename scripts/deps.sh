@@ -194,7 +194,7 @@ check_fcd() {
   echo "=== plugin full-cycle-delivery ==="
   echo "  (skills grill-me grill-with-docs research-agent backend frontend qa playwright-qa ship in this repo)"
   have graphify && ok "graphify        (impact review)" || miss "graphify"
-  mcp_has gitnexus && ok "mcp gitnexus    (impact review)" || warn "mcp gitnexus (npm i -g gitnexus; FCD impact)"
+  mcp_has gitnexus && ok "mcp gitnexus    (impact review)" || miss "mcp gitnexus (npm i -g gitnexus; FCD impact)"
   have gh && ok "gh              (qa / to-issues)" || warn "gh (GitHub CLI)"
 }
 
@@ -204,6 +204,9 @@ check_fcd_v2() {
   have headroom && ok "headroom" || miss "headroom"
   mcp_has ruflo && ok "mcp ruflo" || warn "mcp ruflo"
   mcp_has headroom && ok "mcp headroom" || warn "mcp headroom"
+  # Same impact stack as FCD (review-fix uses $FCD_ROOT prompts)
+  have graphify && ok "graphify        (impact review)" || miss "graphify"
+  mcp_has gitnexus && ok "mcp gitnexus    (impact review)" || miss "mcp gitnexus (npm i -g gitnexus; FCD/FCD-V2 impact)"
 }
 
 check_global() {

@@ -1,8 +1,8 @@
 {
   "name": "fcd-v2",
   "displayName": "FCD-V2 (FCD + optional Ruflo)",
-  "version": "1.2.1",
-  "description": "Standalone alternative to full-cycle-delivery Phase-4 style: same FCD gates by reference, optional Ruflo swarm when escalate criteria fire, thin shared memory board, sidecars, append-only plan deltas, claim-before-edit, Headroom on large sidecar reads. Does not modify full-cycle-delivery.",
+  "version": "1.2.2",
+  "description": "Standalone alternative to full-cycle-delivery Phase-4 style: same FCD gates by reference, optional Ruflo swarm when escalate criteria fire, thin shared memory board, sidecars, append-only plan deltas, claim-before-edit, Headroom on large sidecar reads. Impact review uses graphify + GitNexus (same as FCD). Does not modify full-cycle-delivery.",
   "author": {
     "name": "Toolkit"
   },

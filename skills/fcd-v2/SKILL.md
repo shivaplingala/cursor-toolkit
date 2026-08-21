@@ -118,9 +118,11 @@ Prefer FCD plugin agents (also copied under `fcd-v2/agents/`):
 | `backend-implementer` | Serverless / host-tooling code |
 | `frontend-implementer` | Vue UI / harness |
 | `qa-engineer` | Catalog, gate, FAIL_LIST, sign-off |
-| `coding-reviewer` / `impact-reviewer` / `review-fix-loop` | Dual review to 0 |
+| `coding-reviewer` / `impact-reviewer` / `review-fix-loop` | Dual review to 0 (impact = **graphify + GitNexus**) |
 
 Phase 2 design personas stay on workspace `agency-engineering` — not these implement agents.
+
+**Impact tooling:** `$FCD_ROOT/prompts/impact-reviewer.md` requires **both** graphify and GitNexus. Do not PASS shared-symbol edits on graphify alone.
 
 ## After Phase 4 (Phases 5–7)
 

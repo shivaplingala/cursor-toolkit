@@ -1,0 +1,47 @@
+---
+description: >-
+  Python scripts must detect OS and use OS-specific commands; shell
+  work is OS-specific files, not one Unix script on Windows native.
+alwaysApply: true
+---
+
+# Script OS
+
+Honor `SCRIPT-OS-EXCLUSIONS.md` in this toolkit. Windows **native** = `cmd.exe` / PowerShell. Git Bash and WSL = Unix (same as Linux for `.sh`).
+
+## Python
+
+Detect OS (`sys.platform` / `platform.system()`) and branch. Do not hardcode Unix commands.
+
+| OS | Commands / notes |
+|----|------------------|
+| Linux | `python3`; package mgr only if present (`apt-get` — skip Fedora/Alpine). |
+| macOS | `python3`; Homebrew only if `brew` exists. GNU `date -d` needs `gdate`. |
+| Windows native | `py -3` (not `python3`); `pathlib`; no bash/`ln -s`/`apt`. |
+| WSL | Linux branch (`sys.platform == "linux"`). |
+
+```python
+import sys
+if sys.platform == "win32":
+    py = ["py", "-3"]
+elif sys.platform == "darwin":
+    py = ["python3"]  # brew optional
+else:
+    py = ["python3"]
+```
+
+## Shell
+
+Write **separate** scripts per OS family. Do not ship a `.sh` for Windows native.
+
+- Linux / macOS / Git Bash / WSL → `.sh` (bash 3.2-safe; no bash-4-only).
+- Windows native → `.ps1` (or cmd), not bash.
+- Symlinks: copy fallback when `ln -s` fails (Git Bash).
+- `deps`: apt only if `apt-get`; brew only if Homebrew; Windows Git Bash prints winget hints, does not call winget from bash.
+
+## Do not
+
+- One `.sh` that “also works on Windows” (native).
+- `python3` as the only Windows launcher.
+- `date -d` on stock macOS.
+- Assume apt on every Linux.

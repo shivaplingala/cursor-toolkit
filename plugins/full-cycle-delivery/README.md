@@ -90,7 +90,7 @@ rsync -a --delete \
 ## Review → fix loop (Phase 4–5)
 
 1. Coding reviewer (diff bugs / edge cases) — read-only  
-2. Impact reviewer (GitNexus + graphify) — read-only  
+2. Impact reviewer (GitNexus **and** graphify — both required) — read-only  
 3. Main agent fixes → re-verify → re-review until both `FINDING_COUNT: 0` (max 10)
 
 ## Related

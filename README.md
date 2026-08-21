@@ -8,7 +8,8 @@ Personal collection of **Cursor plugins**, **skills**, and **rules** for agent-a
 |------|------|
 | `plugins/` | Cursor local plugins (FCD, FCD-V2, global tooling, AWS diagnose) |
 | `skills/` | Standalone agent skills (backend, frontend, QA, Headroom, Ruflo, grill-me, graphify, …) |
-| `rules/` | Global Cursor rules (`.mdc`) |
+| `rules/` | Global Cursor rules (`.mdc`), including **script-os** (Python detect OS; shell = OS-specific files) |
+| `SCRIPT-OS-EXCLUSIONS.md` | Which toolkit `.sh` / `.py` run on Linux, macOS, Windows native |
 
 ### Plugins
 
@@ -53,8 +54,8 @@ Skills are markdown; they **call** these tools. `bash install.sh` copies files. 
 
 | Plugin / skill | Installs / checks |
 |----------------|-------------------|
-| **full-cycle-delivery** | Companion skills in this repo; **graphify**; MCP **gitnexus**; **gh** |
-| **fcd-v2** | **ruflo** + **headroom** CLIs and MCP |
+| **full-cycle-delivery** | Companion skills in this repo; **graphify** + MCP **gitnexus** (impact uses **both**); **gh** |
+| **fcd-v2** | Same impact stack as FCD (**graphify** + MCP **gitnexus**); **ruflo** + **headroom** CLIs and MCP |
 | **global-tooling** | **headroom** (`uv tool install headroom-ai`), **ruflo** (`npm i -g ruflo`) |
 | **aws-diagnose** / **agents-*** | **python3**, **boto3**, **jq**; optional **aws** CLI, **agentcore** (`pip install bedrock-agentcore-starter-toolkit`) |
 | **aha-video-understanding** | **ffmpeg**, **openai-whisper**, **yt-dlp**, **tesseract**; MCP **aha-mcp** + **video-analyzer** (`npx mcp-video-analyzer`) |

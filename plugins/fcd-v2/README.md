@@ -33,6 +33,7 @@ When escalate does **not** fire: follow classic FCD Phase 4 (Cursor Task / singl
 ## Dependencies (not bundled)
 
 - FCD skill available for gates/playbooks/prompts (read-only reference)
+- **Impact review (same as FCD):** **graphify** CLI + MCP **gitnexus** — both required; never graphify-only
 - Ruflo MCP `user-ruflo` (swarm / tasks / claims) — only if escalate
 - Headroom MCP `user-headroom` — large sidecar context
 

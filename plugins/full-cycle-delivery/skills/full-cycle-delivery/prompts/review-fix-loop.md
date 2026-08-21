@@ -21,7 +21,7 @@ Also before Phase 7 ship (whole-branch diff), after all tasks complete.
 round = 1
 while true:
   1. Dispatch prompts/coding-reviewer.md  (fresh diff)
-  2. Dispatch prompts/impact-reviewer.md (fresh symbols + GitNexus/graphify)
+  2. Dispatch prompts/impact-reviewer.md (fresh symbols + **both** GitNexus and graphify)
   3. Merge findings (dedupe by path:line / symbol)
   4. If both PASS and FINDING_COUNT==0 → done
   5. Else dispatch prompts/implementer.md (or fix inline) with the merged FAIL list only
