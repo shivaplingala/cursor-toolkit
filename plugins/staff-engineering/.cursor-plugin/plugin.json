@@ -1,0 +1,21 @@
+{
+  "name": "staff-engineering",
+  "displayName": "Staff Engineering (Principal)",
+  "version": "1.1.0",
+  "description": "Staff/principal engineering skills: full-stack MERN/MEAN/MEVN, AI frameworks (LangChain, LangGraph, CrewAI, AutoGen), Python/JS/TS/Go, AWS/GCP/Azure, Docker, Kubernetes, Terraform, Ansible. Aligns with agency-agents/engineering.",
+  "author": { "name": "Toolkit" },
+  "license": "MIT",
+  "keywords": [
+    "staff-engineer",
+    "principal-engineer",
+    "fullstack",
+    "mern",
+    "langchain",
+    "langgraph",
+    "aws",
+    "kubernetes",
+    "terraform"
+  ],
+  "category": "developer-tools",
+  "skills": "./skills/"
+}

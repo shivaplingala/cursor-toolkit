@@ -1,5 +1,9 @@
 # Knowledge log (append-only)
 
+## 2026-08-24
+
+- Phase 3: after research + grill + complete plan, run `plan-review-fix-loop` (coding + impact of planned files/callers) to `FINDING_COUNT: 0` before asking plan approval. Same for `/fcd-v2`. Fixes go in the plan, not product code.
+
 ## 2026-08-12
 
 - Seeded corpus from FCD progress + Playwright QA delivery: localhost-only QA, agency path fix, BE/FE/QA agents, qa-fix-loop, FCD-V2 Phase 4 parity.

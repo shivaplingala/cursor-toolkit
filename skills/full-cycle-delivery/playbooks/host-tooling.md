@@ -6,7 +6,7 @@
 ## Fast lane (still gated)
 
 - Still need **grill-me** then **grill-with-docs**, but keep grill short (≤3 questions each) focused on scope, verify command, and risk to other hosts.
-- Still need **explicit plan approval** before Phase 4.
+- Still need **plan-review-fix-loop** to 0 (planned plugin files + callers) then **explicit plan approval** before Phase 4.
 - Prefer Ponytail; no agency architect unless structural ADR.
 
 ## Order

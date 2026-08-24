@@ -181,3 +181,144 @@ hd_check_skill_link() {
   echo "CHECK FAIL link $dest"
   return 1
 }
+
+# ---------------------------------------------------------------------------
+# Host catalog (user-global). ADR: docs/agent-host-discovery/docs/adr/0003-host-matrix.md
+# GLM Coding Plan uses Claude Code paths. GLM ZCode uses ~/.zcode/skills.
+# DeepSeek Harness also reads ~/.agents/skills (already in link roots).
+# ---------------------------------------------------------------------------
+
+hd_skill_link_roots() {
+  printf '%s\n' \
+    "$HOME/.cursor/skills" \
+    "$HOME/.claude/skills" \
+    "$HOME/.agents/skills" \
+    "$HOME/.codex/skills" \
+    "$HOME/.config/opencode/skills" \
+    "$HOME/.kilo/skills" \
+    "$HOME/.kimi-code/skills" \
+    "$HOME/.qwen/skills" \
+    "$HOME/.dsh/skills" \
+    "$HOME/.zcode/skills"
+}
+
+hd_skill_copy_roots() {
+  printf '%s\n' \
+    "$HOME/.gemini/config/skills" \
+    "$HOME/.gemini/antigravity/skills"
+}
+
+hd_command_dests() {
+  local name="$1"
+  printf '%s\n' \
+    "$HOME/.cursor/commands/${name}.md" \
+    "$HOME/.claude/commands/${name}.md" \
+    "$HOME/.agents/commands/${name}.md" \
+    "$HOME/.codex/prompts/${name}.md" \
+    "$HOME/.config/opencode/command/${name}.md" \
+    "$HOME/.config/kilo/command/${name}.md" \
+    "$HOME/.kimi-code/commands/${name}.md" \
+    "$HOME/.qwen/commands/${name}.md" \
+    "$HOME/.gemini/config/commands/${name}.md" \
+    "$HOME/.gemini/antigravity/commands/${name}.md"
+}
+
+hd_rule_md_dests() {
+  local name="$1"
+  printf '%s\n' \
+    "$HOME/.claude/rules/${name}.md" \
+    "$HOME/.codex/rules/${name}.md"
+}
+
+hd_agent_dirs() {
+  printf '%s\n' \
+    "$HOME/.cursor/agents" \
+    "$HOME/.claude/agents" \
+    "$HOME/.agents/agents" \
+    "$HOME/.config/kilo/agent"
+}
+
+hd_install_skill_all() {
+  local src="$1" name="$2" root
+  while IFS= read -r root; do
+    [[ -n "$root" ]] || continue
+    mkdir -p "$root"
+    hd_link_skill "$src" "$root/$name"
+  done <<EOF
+$(hd_skill_link_roots)
+EOF
+  while IFS= read -r root; do
+    [[ -n "$root" ]] || continue
+    mkdir -p "$root"
+    hd_copy_skill "$src" "$root/$name"
+  done <<EOF
+$(hd_skill_copy_roots)
+EOF
+}
+
+hd_check_skill_all() {
+  local src="$1" name="$2" root rc=0
+  while IFS= read -r root; do
+    [[ -n "$root" ]] || continue
+    hd_check_skill_link "$src" "$root/$name" || rc=1
+  done <<EOF
+$(hd_skill_link_roots)
+EOF
+  while IFS= read -r root; do
+    [[ -n "$root" ]] || continue
+    hd_check_skill_copy "$src" "$root/$name" || rc=1
+  done <<EOF
+$(hd_skill_copy_roots)
+EOF
+  return $rc
+}
+
+hd_install_command_all() {
+  local src="$1" name="$2" dest
+  while IFS= read -r dest; do
+    [[ -n "$dest" ]] || continue
+    mkdir -p "$(dirname "$dest")"
+    hd_install_command "$src" "$dest"
+  done <<EOF
+$(hd_command_dests "$name")
+EOF
+}
+
+hd_check_command_all() {
+  local src="$1" name="$2" dest rc=0
+  while IFS= read -r dest; do
+    [[ -n "$dest" ]] || continue
+    hd_check_file "$src" "$dest" || rc=1
+  done <<EOF
+$(hd_command_dests "$name")
+EOF
+  return $rc
+}
+
+hd_install_rule_all() {
+  local src="$1" name="$2" dest
+  while IFS= read -r dest; do
+    [[ -n "$dest" ]] || continue
+    hd_install_rule_md "$src" "$dest"
+  done <<EOF
+$(hd_rule_md_dests "$name")
+EOF
+  mkdir -p "$HOME/.cursor/rules"
+  cp -f "$src" "$HOME/.cursor/rules/${name}.mdc"
+  echo "rule    $HOME/.cursor/rules/${name}.mdc"
+  hd_install_antigravity_rules "$src" "$name"
+}
+
+hd_install_agent_all() {
+  local src="$1" name="$2" dir
+  [[ -f "$src" ]] || return 0
+  while IFS= read -r dir; do
+    [[ -n "$dir" ]] || continue
+    mkdir -p "$dir"
+    cp -f "$src" "$dir/${name}.md"
+    echo "agent   $dir/${name}.md"
+  done <<EOF
+$(hd_agent_dirs)
+EOF
+}
+

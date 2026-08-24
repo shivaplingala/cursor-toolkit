@@ -15,6 +15,7 @@ Personal collection of **Cursor plugins**, **skills**, and **rules** for agent-a
 
 - **full-cycle-delivery** — gated plan→build→verify→ship (`/full-cycle-delivery`)
 - **fcd-v2** — FCD v2 with optional Ruflo swarm (`/fcd-v2`)
+- **staff-engineering** — staff/principal skills (MERN/MEVN/MEAN, LangChain/LangGraph/CrewAI/AutoGen, Python/JS/TS/Go, AWS/GCP/Azure, Docker/K8s/Terraform/Ansible)
 - **global-tooling** — Headroom, Ruflo, FCD router rules
 - **aws-diagnose** — read-only AWS/SST diagnostics
 
@@ -45,7 +46,7 @@ bash install.sh --check
 1. Copies plugins into `~/.cursor/plugins/local/`
 2. Copies standalone skills into `~/.cursor/skills/`
 3. Copies rules into `~/.cursor/rules/`
-4. Runs host-discovery scripts (FCD, FCD-V2, global-tooling → Claude/Codex/Gemini/…)
+4. Runs host-discovery (`install-all-hosts.sh`) so the same skills/commands/rules land on Cursor, Claude Code, Codex, Antigravity, Zed, Kilo, Kimi, Qwen Code, DeepSeek Harness, GLM (Claude paths + ZCode), and OpenCode
 5. `--deps` installs CLIs; `--check` verifies files + those CLIs + MCP entries
 
 ## Dependencies

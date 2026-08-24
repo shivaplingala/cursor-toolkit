@@ -42,13 +42,12 @@ Never `ruflo init` in a workspace unless asked.
 ## Install
 
 ```bash
+~/.cursor/plugins/local/full-cycle-delivery/scripts/install-all-hosts.sh
+# or just this plugin:
 ~/.cursor/plugins/local/fcd-v2/scripts/install-symlinks.sh
 ```
 
-| Host | Skill | Command | Rule |
-| ---- | ----- | ------- | ---- |
-| Cursor / Claude / agents hub / **Zed** | symlink (`~/.agents/skills` = Zed global) | copy | — |
-| **Antigravity / Gemini** | **real copy** (both `~/.gemini/config/skills` and `~/.gemini/antigravity/skills`) | `~/.gemini/config/commands/fcd-v2.md` | dual `.mdc` + stripped `.md` under `~/.gemini/config/rules/` |
+Host matrix (skills + `/fcd-v2` command + rule where the host supports them): Cursor, Claude Code, GLM Coding Plan, GLM ZCode, Codex, Antigravity, Zed, OpenCode, Kilo, Kimi, Qwen Code, DeepSeek Harness. Catalog: FCD `scripts/lib/host-discovery.sh` / ADR 0003.
 
 Antigravity copies drift until you re-run the installer after plugin updates (**copy freshness**). Glossary/ADRs: workspace `docs/agent-host-discovery/` when the workspace repo is open.
 

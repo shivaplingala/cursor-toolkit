@@ -13,7 +13,7 @@ Installs are user-global. Load skill **cursor-global-tooling** for full how-to.
 |------|-----|-----|
 | Large tool dumps / context / tokens | **Headroom** | MCP `headroom_compress` / `retrieve` / `stats` (`user-headroom`) |
 | Multi-agent swarm / shared memory | **Ruflo** | MCP `swarm_init`, `agent_*`, `memory_*` (`user-ruflo`); state `~/.ruflo` |
-| Plan→build→verify→ship with gates | **full-cycle-delivery** | `/full-cycle-delivery` or skill; grill-me → grill-with-docs → plan approval → review-fix to 0 |
+| Plan→build→verify→ship with gates | **full-cycle-delivery** | `/full-cycle-delivery` or skill; grill-me → grill-with-docs → plan-review to 0 → plan approval → review-fix to 0 |
 
 **Check then use:** if MCP/skill missing, say so and suggest reload / `headroom-cursor` / `ruflo-cursor`. Do not invent substitutes.
 

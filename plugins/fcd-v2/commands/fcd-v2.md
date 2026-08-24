@@ -34,7 +34,7 @@ rest of the user's message. If no task was given, ask once and stop.)
 Rules:
 
 1. **Choose explicitly:** `/fcd-v2` = this skill. `/full-cycle-delivery` = classic FCD. Do not auto-switch the user's choice.
-2. **Phases 0–3:** Follow `$FCD_ROOT` (intake, research, design, grill-me → grill-with-docs, plan, **human approval**). Stop if not approved. Create/update **progress.md**.
+2. **Phases 0–3:** Follow `$FCD_ROOT` (intake, research, design, grill-me → grill-with-docs, plan, **`$FCD_ROOT/prompts/plan-review-fix-loop.md` to `FINDING_COUNT: 0`**, **human approval**). Stop if not approved. Create/update **progress.md**.
 3. **Phase 4 — Implement (mandatory):**
    - Run `$SKILL_ROOT/escalate.md`. Score &lt; 2 → **classic**; score ≥ 2 → `$SKILL_ROOT/protocol.md` (**swarm**). Announce mode.
    - Compatibility pin: require `$FCD_ROOT` playbooks + implementer/coding/impact/review-fix-loop prompts (and qa/backend prompts when in plan).

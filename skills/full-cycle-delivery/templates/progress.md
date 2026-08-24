@@ -12,7 +12,7 @@ Updated: <iso>
 - [ ] 0 Intake
 - [ ] 1 Research
 - [ ] 2 Design
-- [ ] 3 Plan + grill + approval
+- [ ] 3 Plan + grill + plan-review to 0 + approval
 - [ ] 4 Implement
 - [ ] 5 Cross-cutting review
 - [ ] 6 Integration

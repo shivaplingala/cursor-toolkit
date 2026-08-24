@@ -2,7 +2,7 @@
 
 Dispatch agent **`backend-implementer`**. Skills: **backend**, **ponytail**.
 
-Phase 2 design uses **agency-engineering/backend-architect** (not this prompt).
+Phase 2 backend design: agent **`backend-architect`** + skill **backend-architect** (FCD plugin). Merge workspace `agency-engineering/backend-architect` when present. Not this prompt.
 
 ## When
 

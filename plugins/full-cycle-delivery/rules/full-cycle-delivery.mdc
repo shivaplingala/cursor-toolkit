@@ -3,8 +3,9 @@ description: >-
   When delivering features, channels, bug fixes, packages, workflow, or infra
   in serverless-monorepo (or when the user wants plan→build→verify→ship with
   human plan approval), read and follow the full-cycle-delivery skill before
-  implementing. Prefer /full-cycle-delivery over ad-hoc coding. Phase 4–5 must
-  run coding + impact review-fix until 0 findings.
+  implementing. Prefer /full-cycle-delivery over ad-hoc coding. Phase 3 must run plan
+  coding+impact review-fix until 0 findings before asking approval. Phase 4–5
+  must run coding + impact review-fix until 0 findings.
 alwaysApply: false
 ---
 
@@ -13,9 +14,12 @@ alwaysApply: false
 Skill is **global** (plugin + `~/.cursor/skills/full-cycle-delivery`). Prefer plugin path over any workspace copy.
 
 - For delivery work, load **full-cycle-delivery** first.
-- Phases 2–3 require **grill-me** then **grill-with-docs** before plan approval.
+- Phases 2–3 require **grill-me** then **grill-with-docs** then **plan-review-fix-loop** to 0 before plan approval.
+- Phase 2 backend (APIs / Lambda / data / IAM): dispatch **`backend-architect`** agent + skill from FCD plugin.
+- Phase 2 staff/principal design: load **`staff-engineering`** router + narrowest domain skill (`INDEX.md` in staff-engineering plugin).
 - No Phase 4 without explicit plan approval.
 - After approval, stay on full-cycle-delivery — do not freestyle.
-- **Review-fix loop:** coding-reviewer + impact-reviewer until both `FINDING_COUNT: 0`.
+- **Plan review (Phase 3):** coding-reviewer + impact-reviewer of planned files and callers until both `FINDING_COUNT: 0`; edit the plan, not code.
+- **Review-fix loop (Phase 4–5):** coding-reviewer (correctness, security, maintainability, performance, testing) + impact-reviewer of the diff until both `FINDING_COUNT: 0`.
 - No autonomous prod deploy or PR merge.
 - Pair with **research-agent** when external docs are needed.

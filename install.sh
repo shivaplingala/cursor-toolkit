@@ -9,7 +9,7 @@ DEST="${CURSOR_PLUGINS:-$HOME/.cursor/plugins/local}"
 SKILLS="${CURSOR_SKILLS:-$HOME/.cursor/skills}"
 RULES="${CURSOR_RULES:-$HOME/.cursor/rules}"
 
-PLUGINS=(aws-diagnose fcd-v2 full-cycle-delivery global-tooling)
+PLUGINS=(aws-diagnose fcd-v2 full-cycle-delivery global-tooling staff-engineering)
 
 sync_tree() {
   local src="$1" dest="$2"
@@ -73,10 +73,19 @@ install_rules() {
 
 run_host_installers() {
   local fcd="$DEST/full-cycle-delivery"
+  if [[ -f "$fcd/scripts/install-all-hosts.sh" ]]; then
+    FCD_V2_ROOT="$DEST/fcd-v2" \
+    STAFF_ENGINEERING_ROOT="$DEST/staff-engineering" \
+    GLOBAL_TOOLING_ROOT="$DEST/global-tooling" \
+      bash "$fcd/scripts/install-all-hosts.sh"
+    return 0
+  fi
   local v2="$DEST/fcd-v2"
   local gt="$DEST/global-tooling"
+  local staff="$DEST/staff-engineering"
   [[ -f "$fcd/scripts/install-multi-agent.sh" ]] && bash "$fcd/scripts/install-multi-agent.sh"
   [[ -f "$v2/scripts/install-symlinks.sh" ]] && bash "$v2/scripts/install-symlinks.sh"
+  [[ -f "$staff/scripts/install-staff-engineering.sh" ]] && FCD_PLUGIN_ROOT="$fcd" bash "$staff/scripts/install-staff-engineering.sh"
   [[ -f "$gt/scripts/install-multi-agent.sh" ]] && bash "$gt/scripts/install-multi-agent.sh"
 }
 
@@ -89,7 +98,7 @@ check_install() {
   for name in "${PLUGINS[@]}"; do
     [[ -f "$DEST/$name/.cursor-plugin/plugin.json" ]] || { echo "FAIL plugin $name"; ok=1; }
   done
-  for name in grill-me grill-with-docs research-agent backend frontend qa playwright-qa; do
+  for name in grill-me grill-with-docs research-agent backend frontend qa playwright-qa staff-engineering; do
     [[ -f "$SKILLS/$name/SKILL.md" ]] || { echo "FAIL skill $name"; ok=1; }
   done
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {

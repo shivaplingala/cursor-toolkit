@@ -1,11 +1,12 @@
 ---
 name: full-cycle-delivery
 description: >-
-  End-to-end gated delivery (intake → research → grill → plan approval →
-  implement → dual code review with fix-until-zero → verify → ship). Use for
-  features, channels, bug fixes, packages, workflow, and infra — especially in
-  serverless-monorepo. Planning (Phases 2–3) REQUIRES grill-me then grill-with-docs
-  before plan approval. After approval, Phases 4–7 MUST stay on this skill.
+  End-to-end gated delivery (intake → research → grill → plan coding+impact
+  review to 0 → plan approval → implement → dual code review with fix-until-zero
+  → verify → ship). Use for features, channels, bug fixes, packages, workflow,
+  and infra — especially in serverless-monorepo. Planning (Phases 2–3) REQUIRES
+  grill-me then grill-with-docs then plan-review-fix-loop to 0 before plan
+  approval. After approval, Phases 4–7 MUST stay on this skill.
   When external research needed, run research-agent first and require Approved report.
   Installed globally via ~/.cursor/plugins/local/full-cycle-delivery.
 ---
@@ -22,7 +23,7 @@ Repeatable delivery pipeline (primary target: `serverless-monorepo` monorepo).
 1. **No completion claims without fresh verify output** (verification-before-completion).
 2. **Human plan approval** before Phase 4 (implement).
 3. **No autonomous prod deploy or PR merge.**
-4. **Planning must grill:** Phases 2–3 MUST invoke **grill-me** then **grill-with-docs** (read + follow each skill) before asking for plan approval. Do not skip, summarize, or substitute with AskQuestion-only.
+4. **Planning must grill then plan-review to 0:** Phases 2–3 MUST invoke **grill-me** then **grill-with-docs** (read + follow each skill), then **`prompts/plan-review-fix-loop.md`** until coding + impact of the **plan** both return `FINDING_COUNT: 0`. Do not skip, summarize, or substitute grill with AskQuestion-only. Do not ask for plan approval with open plan-review findings.
 5. **Implementation stays on this skill:** After plan approval, Phases 4–7 MUST continue under **full-cycle-delivery** (playbooks, prompts, verify-scope, review matrix). Do not freestyle implement outside this pipeline. Nested skills (subagent-driven-development, autonomous-dev-loop, verification-before-completion) run *as prescribed by this skill*, not instead of it.
 6. **Grow knowledge every usage:** Read `$SKILL_ROOT/knowledge/` before Phase 4; run `prompts/knowledge-capture.md` on Phase 7 (and mid-delivery when a sharp lesson appears). Shared with `/fcd-v2`.
 
@@ -34,9 +35,11 @@ Repeatable delivery pipeline (primary target: `serverless-monorepo` monorepo).
 | Path | Purpose |
 | ---- | ------- |
 | `$SKILL_ROOT/playbooks/*.md` | Work-type checklists |
-| `$SKILL_ROOT/prompts/*.md` | Subagent briefs (implementer, reviewers, architect, review-fix loop, **qa**, **knowledge-capture**) |
+| `$SKILL_ROOT/prompts/*.md` | Subagent briefs (implementer, reviewers, **backend-architect**, architect, review-fix loop, **qa**, **knowledge-capture**) |
+| `$PLUGIN_ROOT/skills/backend-architect/` | Phase 2 backend architect skill (bundled) |
 | `$SKILL_ROOT/knowledge/` | Growing delivery craft (build / debug / fix / performance / qa / swarm + log) — shared with FCD-V2 |
-| `$SKILL_ROOT/prompts/review-fix-loop.md` | Main-agent protocol: coding + impact → fix until 0 |
+| `$SKILL_ROOT/prompts/review-fix-loop.md` | Main-agent protocol: coding + impact of the **diff** → fix until 0 |
+| `$SKILL_ROOT/prompts/plan-review-fix-loop.md` | Main-agent protocol: coding + impact of the **plan** → edit plan until 0, then ask approval |
 | `~/.cursor/skills/research-agent/` (or `$REPO/.claude/skills/research-agent/`) | Pre-build research |
 | `$REPO/scripts/verify-scope.sh` | Per-workspace verify (required when in serverless-monorepo) |
 | `$REPO/docs/plans/TEMPLATE.md` | Implementation plan template |
@@ -47,20 +50,23 @@ Repeatable delivery pipeline (primary target: `serverless-monorepo` monorepo).
 
 ```text
 Phase 0–1  →  intake + research (research-agent when needed)
-Phase 2–3  →  design/plan + grill-me → grill-with-docs → human plan approval
+Phase 2–3  →  design/plan + grill-me → grill-with-docs → plan-review-fix-loop to 0 → human plan approval
 Phase 4–7  →  full-cycle-delivery only (implement → review → integrate → ship)
 ```
 
 | Gate | Required skills | Fail closed |
 | ---- | --------------- | ----------- |
-| Before plan approval (end of Phase 3) | **grill-me** then **grill-with-docs** | No Phase 4 without both sessions completed and shared understanding recorded |
+| Before plan approval (end of Phase 3) | **grill-me** then **grill-with-docs** then **plan-review-fix-loop** to 0 | No Phase 4 without both sessions, plan review `PASS` / `FINDING_COUNT: 0`, and shared understanding recorded |
 | Phase 4+ | **full-cycle-delivery** (this skill) + `subagent-driven-development` + `verification-before-completion` | No ad-hoc coding outside playbook/prompts/verify loop |
 
 **Grill order (mandatory):**
 
 1. Load and follow **grill-me** — one question at a time; explore codebase when a question is answerable that way; recommend an answer each time. **After each locked answer**, append it under `## Grill-Q&A` in the active plan file (create the heading if missing). Format: `- Q: … A: …`.
 2. Load and follow **grill-with-docs** — same interview style, but challenge against domain docs (`CONTEXT.md` / glossary), sharpen terms, update docs/ADRs inline when decisions crystallise. Append the same way under `## Grill-Q&A` (prefix with `(docs)` if useful).
-3. Only then: request explicit human plan approval and stop if not approved.
+3. **Phase 3 only** (complete plan required): follow **`prompts/plan-review-fix-loop.md`** — coding + impact review of planned files and where that code is used; edit the plan until both `FINDING_COUNT: 0`.
+4. Only then: request explicit human plan approval and stop if not approved.
+
+Do not run step 3 during Phase 2 design grill.
 
 **Plan waivers:** Optional plan section `## WAIVED` lists nits the human accepts with a one-line reason. Coding/impact reviewers must not count those toward `FINDING_COUNT` (still list under `WAIVED:`). Blockers / should-fix / edge-case cannot be waived without a new human approval line.
 
@@ -70,7 +76,7 @@ Phase 4–7  →  full-cycle-delivery only (implement → review → integrate �
 
 **Knowledge (grow every usage):** On implement start, skim `$SKILL_ROOT/knowledge/INDEX.md` + topic files that match the work (build/debug/fix/performance/qa). Capture lessons via `prompts/knowledge-capture.md` — mandatory at Phase 7 / meaningful stop; optional mid-flight for sharp wins. FCD-V2 writes the **same** corpus (`$FCD_ROOT/knowledge/`).
 
-Announce when entering each: `Using grill-me to stress-test the plan` / `Using grill-with-docs to align with domain docs`.
+Announce when entering each: `Using grill-me to stress-test the plan` / `Using grill-with-docs to align with domain docs` / `Using plan-review-fix-loop to impact-review the plan`.
 
 ## Phase 0 — Intake (mandatory)
 
@@ -118,28 +124,35 @@ Lightweight research must include: files/symbols to touch, patterns to reuse, Gi
 
 ## Phase 2 — Design and architecture
 
-**Personas (agency-agents):** Resolve `agency-engineering` from the open workspace first:
+**Staff / principal router:** Load skill **`staff-engineering`** (`~/.cursor/skills/staff-engineering/`) then the **narrowest domain skill** (e.g. `fullstack-js-stacks`, `langchain-principal`, `aws-principal`). Install: `staff-engineering/scripts/install-staff-engineering.sh`. Index: `staff-engineering/INDEX.md`.
+
+**Backend APIs / Lambda / data / IAM:** Dispatch agent **`backend-architect`** with skill **backend-architect** and `prompts/backend-architect.md`. Bundled with this plugin (`skills/backend-architect/`). When workspace has `agency-engineering/backend-architect`, merge its Applaud appendix into the design.
+
+**Other personas (agency-agents):** Resolve `agency-engineering` from the open workspace:
 
 1. `$REPO/serverless-monorepo/.cursor/skills/agency-engineering/` (or `.claude/skills/agency-engineering/`)
 2. `$REPO/.cursor/skills/agency-engineering/` if present
-3. Else fail closed for persona load: use `prompts/architect.md` + link upstream from `AGENCY-AGENTS-ENGINEERING.md` — do **not** invent a parallel architect skill
+3. Else fail closed: use `prompts/architect.md` + link upstream from `AGENCY-AGENTS-ENGINEERING.md` — do **not** invent parallel persona skills
 
 Router: `agency-engineering/SKILL.md` + `INDEX.md`.
 
-| Need | Persona skill |
-| ---- | ------------- |
-| APIs / Lambda / data / IAM | `backend-architect` |
+| Need | Persona / agent / skill |
+| ---- | ----------------------- |
+| Full-stack MERN/MEAN/MEVN, polyglot, AI frameworks, multi-cloud | **`staff-engineering`** router + domain skill (`fullstack-js-stacks`, `langchain-principal`, `aws-principal`, …) |
+| APIs / Lambda / data / IAM | **`backend-architect`** (FCD plugin) + workspace `agency-engineering/backend-architect` when present |
 | Vue UI contracts / a11y | `frontend-developer` (Vue appendix; ignore React) |
 | Orchestrator / SFN / agents | `multi-agent-architect` |
 | Module boundaries / ADR | `software-architect` |
 | Mail / MIME → LLM | `email-intelligence` |
 | Prompts | `prompt-engineer` |
 
+Announce: `Using staff-engineering to route Phase 2 design` then `Using backend-architect for Phase 2 backend design` when those apply.
+
 **QA is not a Phase 2 architect persona** — catalog work starts Phase 3/4 via **qa-engineer**. Reality-Checker posture (evidence before “ready”) applies at Phase 6–7.
 
 **Deliverables:** ADR for structural decisions (`docs/adrs/TEMPLATE.md`); two options + trade-offs; failure-mode notes; UI contract when Frontend in scope.
 
-Dispatch `prompts/architect.md` for non-trivial design.
+Dispatch `prompts/architect.md` for cross-cutting or non-backend design; dispatch `prompts/backend-architect.md` for backend-heavy work.
 
 **Mandatory grill (design):** After draft options exist, run **grill-me** then **grill-with-docs** on the design tree before Phase 3. Do not proceed on unresolved branches.
 
@@ -151,9 +164,11 @@ Dispatch `prompts/architect.md` for non-trivial design.
 
 **Mandatory grill (plan):** After the draft plan exists, run **grill-me** then **grill-with-docs** again on the plan (tasks, verify commands, risks, docs impact). Update the plan (and CONTEXT/ADRs if grill-with-docs requires it) until shared understanding.
 
-**Human gate:** explicit plan approval before Phase 4 — only after both grill sessions complete.
+**Mandatory plan impact review:** After grill and a complete plan (tasks + file lists), follow **`prompts/plan-review-fix-loop.md`**. Dispatch coding-reviewer + impact-reviewer on the **plan** (planned files and callers). Edit the plan until both return `PASS` / `FINDING_COUNT: 0` (0 issues, bugs, edge cases, other). Write `docs/plans/<slug>.plan-review.round-<n>.md`. If a finding invalidates a locked Grill-Q&A answer, re-open **that** question only (prefix `(impact)`); do not re-run full grill.
 
-**Stop rule:** If the user has not approved the grilled plan, **stop**. Do not start Phase 4.
+**Human gate:** explicit plan approval before Phase 4 — only after both grill sessions **and** plan-review-fix-loop `FINDING_COUNT: 0`.
+
+**Stop rule:** If the user has not approved the grilled, plan-reviewed plan, **stop**. Do not start Phase 4.
 
 **QA in the plan:** When the delivery is user-facing, touches `ui-vue3-app`, or needs Playwright/resume-board gates, include QA tasks (catalog, id-map, gate, smoke, sign-off). Dispatch via `prompts/qa.md` / agent **`qa-engineer`**.
 
@@ -176,7 +191,7 @@ Dispatch `prompts/architect.md` for non-trivial design.
 4. Update **progress.md**: task status, agent, verify; on subagent spawn create `briefs/T<id>.md` and a Tasks row
 5. Dispatch `prompts/spec-reviewer.md` → fix until plan matches
 6. **Zero-finding review loop** — follow `prompts/review-fix-loop.md` end to end:
-   - Dispatch `prompts/coding-reviewer.md` (coding / bugs / edge cases) — read-only; reports to main agent
+   - Dispatch `prompts/coding-reviewer.md` (correctness, security, maintainability, performance CPU/memory, branch/test coverage) — read-only; reports to main agent
    - Dispatch `prompts/impact-reviewer.md` (full codebase impact via GitNexus + graphify) — read-only; reports to main agent
    - Write `sidecars/T<id>.round-<n>.md` with STATUS / FINDING_COUNT / OPEN; set Tasks `coding` / `impact` / `history` (e.g. `R1 FAIL → R2`)
    - Main agent merges findings and dispatches fixes (`backend-implementer` / `frontend-implementer` / `implementer` or inline)
@@ -184,7 +199,7 @@ Dispatch `prompts/architect.md` for non-trivial design.
 7. Mark task `done` only when coding PASS 0, impact PASS 0, and verify green (unless human `deferred`). QA tasks: gate/status vocabulary from **qa** / progress template.
 8. Check off tasks in plan only after the loop exits clean (QA non-code tasks: catalog/gate reviewed, no review-fix required unless they changed product code)
 
-**Also apply** `prompts/quality-reviewer.md` checklist inside coding review (domain rows).
+**Also apply** `prompts/quality-reviewer.md` domain checklist inside coding review (tenant, retry, i18n, etc.).
 
 **Iteration limits:** verify 5×/task; review-fix loop max **10 rounds**/task then escalate to human with open findings. Do **not** advance with open blocker / should-fix / edge-case.
 
@@ -227,6 +242,7 @@ Full matrix: `skills-agents-autos-plans/FULL-CYCLE-DELIVERY-PLAN.md` §10.
 ## Exit criteria (production candidate)
 
 - [ ] grill-me + grill-with-docs completed before plan approval
+- [ ] Plan-review-fix-loop exited with coding + impact `FINDING_COUNT: 0` before asking approval
 - [ ] Plan explicitly approved
 - [ ] All plan tasks checked under full-cycle-delivery (not freestyle)
 - [ ] `verify-scope` green for every touched serverless-monorepo workspace **or** host-tooling doctor/matrix/`--check` green when work type is `host-tooling`
@@ -248,7 +264,7 @@ Use full-cycle-delivery skill.
 Work type: async-channel-greenfield
 Task: Add WhatsApp channel (after research report Approved).
 Run research-agent first if no Approved report exists.
-Phases 2–3: grill-me then grill-with-docs before plan approval.
+Phases 2–3: grill-me then grill-with-docs then plan-review-fix-loop to 0 before plan approval.
 After approval: stay on full-cycle-delivery for implement → ship.
 Personal SST stage only.
 ```
@@ -259,7 +275,7 @@ Personal SST stage only.
 Use full-cycle-delivery skill.
 Work type: bugfix-minimal
 Ponytail only — smallest diff.
-Still grill-me + grill-with-docs on the plan before implement.
+Still grill-me + grill-with-docs + plan-review-fix-loop to 0 on the plan before implement.
 verify-scope on touched workspace only.
 ```
 
@@ -270,12 +286,15 @@ verify-scope on touched workspace only.
 | **grill-me** | **Required** Phases 2–3 — stress-test design/plan (before approval) |
 | **grill-with-docs** | **Required** Phases 2–3 — domain/glossary/ADR alignment (after grill-me) |
 | research-agent | Pre-build external/provider research |
-| writing-plans | Phase 3 plan draft (before final grill + approval) |
+| writing-plans | Phase 3 plan draft (before final grill + plan-review-fix-loop + approval) |
+| **plan-review-fix-loop** | **Required** end of Phase 3 — coding + impact of planned files/callers until 0, then ask approval |
 | autonomous-dev-loop | Phases 4–8 fix/retest loop with `scripts/loop-controller.sh` (under this skill) |
 | agency-engineering (workspace) | Phase 2 personas — see Phase 2 path resolution |
 | aws-diagnose-read | Post-deploy incident evidence |
 | **ponytail** | **Required for all code edits** (backend / frontend / QA tests). Invokable skill + always-on rule |
-| **backend** | Serverless / host-tooling implement; agent **backend-implementer**; Phase 2 design → agency **backend-architect** |
+| **staff-engineering** | **Phase 2** router + 19 domain skills (20 including router: full-stack, AI, languages, cloud) |
+| **backend-architect** | **Phase 2** APIs / Lambda / data / IAM design (bundled skill + agent) |
+| **backend** | Serverless / host-tooling implement; agent **backend-implementer** |
 | **frontend** | Vue 3 implement; agent **frontend-implementer**; Phase 2 design → agency **frontend-developer** |
 | **qa** | Catalog / defects / sign-off; agent **qa-engineer**; Phase 6–7 Reality-Checker evidence posture |
 | **playwright-qa** | UI E2E under **qa-engineer** / FE harness |

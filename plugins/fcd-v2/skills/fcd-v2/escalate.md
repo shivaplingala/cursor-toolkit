@@ -39,7 +39,7 @@ Count how many are true; need **≥ 2**:
 
 Even when escalate ≥ 2:
 
-- Do not skip grill / plan approval / verify (verify-scope **or** host-tooling doctor/matrix) / coding+impact to 0
+- Do not skip grill / plan-review-fix-loop to 0 / plan approval / verify (verify-scope **or** host-tooling doctor/matrix) / coding+impact to 0
 - Do not `ruflo init` in the open repo unless user asks
 - Do not use Ruflo for token savings (use Headroom)
 - Serial shared foundations first when later tasks depend on them (e.g. `channels/shared` before WA∥SMS apps)

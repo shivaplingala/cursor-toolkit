@@ -6,7 +6,8 @@ description: >-
   plan deltas, claim-before-edit, and Headroom on large sidecar reads. Use when
   the user invokes /fcd-v2 or asks for FCD-V2 / FCD Ruflo orchestration. Does
   not replace /full-cycle-delivery — user chooses. Keep FCD iron laws (grill,
-  plan approval, coding+impact to 0, no autonomous prod merge).
+  plan approval, coding+impact to 0, no autonomous prod merge). Phases 2–3 also
+  require plan-review-fix-loop to 0 before asking approval.
 ---
 
 # FCD-V2
@@ -21,9 +22,13 @@ Standalone alternative to classic **full-cycle-delivery** (FCD v1).
 1. `~/.cursor/plugins/local/fcd-v2/skills/fcd-v2`
 2. `~/.cursor/skills/fcd-v2`
 3. `~/.claude/skills/fcd-v2`
-4. `~/.agents/skills/fcd-v2` (Agents hub / **Zed** global skills)
-5. `~/.gemini/config/skills/fcd-v2`
-6. `~/.gemini/antigravity/skills/fcd-v2`
+4. `~/.agents/skills/fcd-v2` (Agents hub / **Zed** / DeepSeek user-agents)
+5. `~/.codex/skills/fcd-v2`
+6. `~/.qwen/skills/fcd-v2`
+7. `~/.dsh/skills/fcd-v2`
+8. `~/.zcode/skills/fcd-v2`
+9. `~/.gemini/config/skills/fcd-v2`
+10. `~/.gemini/antigravity/skills/fcd-v2`
 
 `$FCD_ROOT` = classic FCD skill (read-only dependency for gates/playbooks/prompts):
 
@@ -40,7 +45,7 @@ If `$FCD_ROOT` is missing, say so and stop (or fall back only if user allows doc
 1. No completion claims without fresh verify output.
 2. Human plan approval before Phase 4 implement.
 3. No autonomous prod deploy or PR merge.
-4. Phases 2–3: **grill-me** then **grill-with-docs** before plan approval.
+4. Phases 2–3: **grill-me** then **grill-with-docs**, then **`$FCD_ROOT/prompts/plan-review-fix-loop.md`** until coding + impact of the plan are `FINDING_COUNT: 0`, before plan approval.
 5. After approval, stay on this skill for Phases 4–7 (do not freestyle).
 6. Phase 5 / ship: coding + impact review-fix until both `FINDING_COUNT: 0`.
 7. **Progress ledger:** create/update `progress.md` (see `$FCD_ROOT/templates/progress.md`). New chat → resume from progress; do not re-intake. Swarm `memory.md` stays thin (pointers to sidecars only). Code edits → **ponytail** only.
@@ -50,7 +55,7 @@ If `$FCD_ROOT` is missing, say so and stop (or fall back only if user allows doc
 
 | Phase | Behavior |
 | ----- | -------- |
-| 0–3 | Follow `$FCD_ROOT/SKILL.md` (intake, research, design, plan, grill, approval) |
+| 0–3 | Follow `$FCD_ROOT/SKILL.md` (intake, research, **`staff-engineering`** + domain skills, **`backend-architect`** for APIs/Lambda/data/IAM, plan, grill, **plan-review-fix-loop to 0**, approval) |
 | **4** | **Implement** — escalate → classic **or** swarm; same per-task gates as FCD (below) |
 | 5–7 | Whole-branch review-fix, integrate (incl. **qa-fix-loop**), ship — never autonomous prod |
 
@@ -68,6 +73,8 @@ Announce: `Using FCD-V2` and whether Phase 4 is `classic` or `swarm`.
 - `$FCD_ROOT/prompts/coding-reviewer.md`
 - `$FCD_ROOT/prompts/impact-reviewer.md`
 - `$FCD_ROOT/prompts/review-fix-loop.md`
+- `$FCD_ROOT/prompts/plan-review-fix-loop.md`
+- `$FCD_ROOT/prompts/backend-architect.md` when Phase 2 APIs/Lambda/data/IAM
 - `$FCD_ROOT/prompts/qa.md` + `qa-fix-loop.md` when UI/QA in plan
 - `$FCD_ROOT/prompts/backend.md` when serverless/host-tooling in plan
 
@@ -115,12 +122,13 @@ Prefer FCD plugin agents (also copied under `fcd-v2/agents/`):
 
 | Agent | Role |
 | ----- | ---- |
+| `backend-architect` | Phase 2 APIs / Lambda / data / IAM design (`$FCD_ROOT` skill + agent) |
 | `backend-implementer` | Serverless / host-tooling code |
 | `frontend-implementer` | Vue UI / harness |
 | `qa-engineer` | Catalog, gate, FAIL_LIST, sign-off |
 | `coding-reviewer` / `impact-reviewer` / `review-fix-loop` | Dual review to 0 (impact = **graphify + GitNexus**) |
 
-Phase 2 design personas stay on workspace `agency-engineering` — not these implement agents.
+Phase 2: **`staff-engineering`** router + domain skill; **`backend-architect`** from `$FCD_ROOT` for APIs/Lambda/data/IAM; remaining Applaud personas from workspace `agency-engineering`. Phase 4 implement agents below.
 
 **Impact tooling:** `$FCD_ROOT/prompts/impact-reviewer.md` requires **both** graphify and GitNexus. Do not PASS shared-symbol edits on graphify alone.
 
@@ -143,5 +151,6 @@ Phase 2 design personas stay on workspace `agency-engineering` — not these imp
 - `$SKILL_ROOT/escalate.md` — when Ruflo is needed
 - `$SKILL_ROOT/protocol.md` — board, sidecars, deltas, claims, Headroom, completeness
 - `$FCD_ROOT/playbooks/*` — work-type checklists
-- `$FCD_ROOT/prompts/*` — implementer / reviewers / review-fix-loop / knowledge-capture
+- `$FCD_ROOT/prompts/*` — implementer / reviewers / **backend-architect** / review-fix-loop / **plan-review-fix-loop** / knowledge-capture
 - `$FCD_ROOT/knowledge/` — growing delivery craft (shared with `/full-cycle-delivery`)
+- `~/.cursor/plugins/local/staff-engineering/` — Phase 2 staff/principal router + domain skills

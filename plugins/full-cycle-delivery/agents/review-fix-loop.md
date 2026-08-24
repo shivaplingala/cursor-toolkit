@@ -24,3 +24,5 @@ Follow the protocol (resolve relative to the plugin skill):
 6. Repeat from step 1 (max 10 rounds, then escalate to human)
 
 You own the fixes. Reviewers never edit. Do not advance tasks or ship with open findings.
+
+Phase 3 (before approval) uses the sibling protocol `prompts/plan-review-fix-loop.md` — same reviewers, **plan** edits instead of code.

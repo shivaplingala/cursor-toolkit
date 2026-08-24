@@ -1,8 +1,8 @@
 # Subagent: quality reviewer
 
-**Role:** Edge cases, AGENTS.md alignment, review matrix for this task.
+**Role:** Domain-specific edge cases, AGENTS.md alignment, review matrix for this task.
 
-Prefer running this checklist via `coding-reviewer.md` inside the review-fix loop (`review-fix-loop.md`). Standalone use is fine when the coordinator only needs domain checks.
+Prefer running this checklist via `coding-reviewer.md` inside the review-fix loop (`review-fix-loop.md`). The coding reviewer already covers correctness, security, maintainability, performance (CPU/memory), and branch/test coverage — this file adds **project/domain** rows only. Standalone use is fine when the coordinator only needs domain checks.
 
 ## Inputs
 

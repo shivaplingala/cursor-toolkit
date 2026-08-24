@@ -1,7 +1,7 @@
 # Full-Cycle Delivery
 
 **Global** gated delivery pipeline
-(intake → research → grill → plan approval → implement → dual review →
+(intake → research → grill → plan coding+impact to 0 → plan approval → implement → dual review →
 fix-until-0 → verify → ship).
 
 ## Canonical install (source of truth)
@@ -24,40 +24,37 @@ Cursor also discovers it via:
 
 ## Multi-agent install (same skill, other hosts)
 
-Same pattern as Cursor’s “plugin + discovery path”: one canonical tree, then
-per-agent skill + `/full-cycle-delivery` command.
-
 ```bash
-~/.cursor/plugins/local/full-cycle-delivery/scripts/install-multi-agent.sh
+~/.cursor/plugins/local/full-cycle-delivery/scripts/install-all-hosts.sh
 ```
+
+One catalog in `scripts/lib/host-discovery.sh` (ADR 0003). Per-plugin scripts still work.
 
 | Host | Skill discovery | Slash / command | Rule |
 | ---- | --------------- | --------------- | ---- |
-| **Cursor** | `~/.cursor/skills/…` (symlink) + plugin | `/full-cycle-delivery` | plugin rule |
-| **Claude Code** | `~/.claude/skills/…` (symlink) | `~/.claude/commands/…` | stripped `.md` |
-| **GLM Coding Plan** | Uses Claude Code paths (Z.AI → Claude Code) | same as Claude | same |
-| **Codex** | `~/.codex/skills/…` (symlink) | `~/.codex/prompts/…` + rule | stripped `.md` |
-| **Antigravity / Gemini** | `~/.gemini/config/skills/…` + `~/.gemini/antigravity/skills/…` (**real copy**) | `~/.gemini/config/commands/…` | dual `.mdc` + stripped `.md` |
-| **OpenCode** | `~/.config/opencode/skills/…` (symlink) | `~/.config/opencode/command/…` | — |
-| **Kilo Code** | `~/.kilo/skills/…` (symlink) | `~/.config/kilo/command/…` | — |
-| **Kimi Code** | `~/.kimi-code/skills/…` (symlink) | `~/.kimi-code/commands/…` | — |
-| **Agents hub / Zed** | `~/.agents/skills/…` (symlink; **Zed global skills root**) | `~/.agents/commands/…` | — |
+| **Cursor** | `~/.cursor/skills/` (symlink) + plugin | `~/.cursor/commands/` | plugin + `~/.cursor/rules/*.mdc` |
+| **Claude Code** | `~/.claude/skills/` | `~/.claude/commands/` | stripped `~/.claude/rules/*.md` |
+| **GLM Coding Plan** | Claude Code paths | same as Claude | same |
+| **GLM ZCode** | `~/.zcode/skills/` | skill name as `/name` | — |
+| **Codex** | `~/.codex/skills/` | `~/.codex/prompts/` | stripped `~/.codex/rules/*.md` |
+| **Antigravity / Gemini** | **real copy** both Gemini skill roots | both command roots | dual `.mdc` + stripped `.md` |
+| **Zed** | `~/.agents/skills/` | `~/.agents/commands/` | — |
+| **OpenCode** | `~/.config/opencode/skills/` | `~/.config/opencode/command/` | — |
+| **Kilo Code** | `~/.kilo/skills/` | `~/.config/kilo/command/` | — |
+| **Kimi Code** | `~/.kimi-code/skills/` | `~/.kimi-code/commands/` | — |
+| **Qwen Code** | `~/.qwen/skills/` | `~/.qwen/commands/` | — |
+| **DeepSeek Harness** | `~/.dsh/skills/` **and** `~/.agents/skills/` | — | — |
 
-Antigravity gets a **copy** (not a symlink) because Antigravity IDE has known
-gaps following symlinked skills under some roots. Re-run the install script
-after updating the plugin skill (**copy freshness**). Glossary/ADRs:
-`docs/agent-host-discovery/` in the workspace.
-
-**Zed** loads global skills from `~/.agents/skills/` (official); install already
-symlinks there — no separate Zed tree.
+Antigravity gets a **copy** (not a symlink). Re-run the installer after plugin updates (**copy freshness**). Glossary/ADRs: `docs/agent-host-discovery/` in the workspace.
 
 Health:
 
 ```bash
 ~/.cursor/plugins/local/full-cycle-delivery/scripts/fcd-doctor.sh
-~/.cursor/plugins/local/full-cycle-delivery/scripts/install-multi-agent.sh --check
+~/.cursor/plugins/local/full-cycle-delivery/scripts/install-all-hosts.sh --check
 ~/.cursor/plugins/local/full-cycle-delivery/scripts/test-host-matrix.sh
 ```
+
 
 Dependencies (global; already linked for Cursor/Claude):
 

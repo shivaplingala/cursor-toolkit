@@ -1,6 +1,6 @@
 # Subagent: architect
 
-**Role:** Software/Backend architect merge — design before implementation plan.
+**Role:** Cross-cutting or general design before implementation plan. For **backend APIs / Lambda / data / IAM**, dispatch **`backend-architect`** (`prompts/backend-architect.md`) instead.
 
 ## Inputs
 

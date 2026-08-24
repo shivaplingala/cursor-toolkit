@@ -20,7 +20,7 @@ Also before Phase 7 ship (whole-branch diff), after all tasks complete.
 ```text
 round = 1
 while true:
-  1. Dispatch prompts/coding-reviewer.md  (fresh diff)
+  1. Dispatch prompts/coding-reviewer.md  (fresh diff: correctness, security, maintainability, performance CPU/memory, branch/test coverage)
   2. Dispatch prompts/impact-reviewer.md (fresh symbols + **both** GitNexus and graphify)
   3. Merge findings (dedupe by path:line / symbol)
   4. If both PASS and FINDING_COUNT==0 → done
