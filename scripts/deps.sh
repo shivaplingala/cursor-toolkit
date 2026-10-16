@@ -241,7 +241,9 @@ check_graphify() {
 
 check_applaud_debug() {
   echo "=== skill applaud-debug ==="
-  local ad="$ROOT/skills/applaud-debug"
+  local root
+  root="$(cd "$(dirname "$0")/.." && pwd)"
+  local ad="$root/skills/applaud-debug"
   [[ -f "$ad/SKILL.md" ]] && ok "skill files" || miss "skills/applaud-debug (run install.sh)"
   have node && ok "node            (Playwright repro specs)" || warn "node"
   if [[ -f "$ad/package.json" ]] && [[ -d "$ad/node_modules/@playwright/test" ]]; then
@@ -250,7 +252,7 @@ check_applaud_debug() {
     warn "playwright in $ad — run: (cd $ad && npm i)"
   fi
   have graphify && ok "graphify        (code orientation)" || warn "graphify"
-  [[ -f "$ROOT/skills/aha-video-understanding/SKILL.md" ]] && ok "aha-video-understanding (ticket media)" || warn "aha-video-understanding skill"
+  [[ -f "$root/skills/aha-video-understanding/SKILL.md" ]] && ok "aha-video-understanding (ticket media)" || warn "aha-video-understanding skill"
 }
 
 check_agentmemory() {
