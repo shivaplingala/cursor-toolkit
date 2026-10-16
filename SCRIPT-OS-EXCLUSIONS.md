@@ -56,6 +56,8 @@ Need **Python 3**. On Windows native, `python3` is often missing — use `py -3`
 | `skills/aha-video-understanding/scripts/aha_list_comment_images.py` | run | run | **run** if Python 3 | Same. |
 | `skills/aha-video-understanding/scripts/aha_download_video.py` | run | run | **run** if Python 3 | Writes to `~/.cache/aha-videos/` (`Path.home()`). |
 | `skills/aha-video-understanding/scripts/aha_download_images.py` | run | run | **run** if Python 3 | Writes to `~/.cache/aha-images/`. |
+| `skills/applaud-debug/scripts/aha_intake.py` | run | run | **run** if Python 3 | Imports `aha-video-understanding` scripts; Aha token required. |
+| `skills/applaud-debug/scripts/stage_logs.sh` | run | run | **excluded** | SSH to stage; Linux/macOS/Git Bash/WSL only. |
 
 ---
 

@@ -106,6 +106,7 @@ check_install() {
   }
   echo
   bash "$ROOT/scripts/deps.sh" --check || ok=1
+  bash "$ROOT/scripts/install-applaud-debug.sh" --check || ok=1
   return "$ok"
 }
 
@@ -143,6 +144,7 @@ case "${1:-}" in
     install_skills
     install_rules
     run_host_installers
+    bash "$ROOT/scripts/install-applaud-debug.sh"
     echo
     bash "$ROOT/scripts/deps.sh" --check || true
     echo

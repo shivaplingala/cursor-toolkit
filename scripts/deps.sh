@@ -239,6 +239,20 @@ check_graphify() {
   have graphify && ok "graphify CLI" || miss "graphify (uv tool install graphifyy)"
 }
 
+check_applaud_debug() {
+  echo "=== skill applaud-debug ==="
+  local ad="$ROOT/skills/applaud-debug"
+  [[ -f "$ad/SKILL.md" ]] && ok "skill files" || miss "skills/applaud-debug (run install.sh)"
+  have node && ok "node            (Playwright repro specs)" || warn "node"
+  if [[ -f "$ad/package.json" ]] && [[ -d "$ad/node_modules/@playwright/test" ]]; then
+    ok "playwright      (skill-local npm i)"
+  else
+    warn "playwright in $ad — run: (cd $ad && npm i)"
+  fi
+  have graphify && ok "graphify        (code orientation)" || warn "graphify"
+  [[ -f "$ROOT/skills/aha-video-understanding/SKILL.md" ]] && ok "aha-video-understanding (ticket media)" || warn "aha-video-understanding skill"
+}
+
 check_agentmemory() {
   echo "=== skills agentmemory-* / remember / recall / recap / forget / handoff ==="
   mcp_has agentmemory && ok "mcp agentmemory" || warn "mcp agentmemory (npx @agentmemory/mcp; optional local server :3111)"
@@ -247,7 +261,7 @@ check_agentmemory() {
 check_prompt_only() {
   echo "=== prompt-only skills (no extra install; files already copied) ==="
   echo "  ponytail caveman tdd review grill-me grill-with-docs research-agent"
-  echo "  backend frontend qa playwright-qa diagnose design-an-interface prototype"
+  echo "  backend frontend qa playwright-qa applaud-debug diagnose design-an-interface prototype"
   echo "  to-prd to-issues triage teach write-a-skill write-agentmemory-skill"
   echo "  request-refactor-plan improve-codebase-architecture migrate-to-shoehorn"
   echo "  ubiquitous-language zoom-out edit-article writing-* scaffold-exercises"
@@ -275,6 +289,7 @@ do_check() {
   check_aws
   check_aha
   check_graphify
+  check_applaud_debug
   check_agentmemory
   check_prompt_only
   check_mcp_block

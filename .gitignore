@@ -14,5 +14,7 @@ Thumbs.db
 # Build / cache
 graphify-out/
 node_modules/
+test-results/
 __pycache__/
 *.pyc
+skills/applaud-debug/repros/*.spec.ts

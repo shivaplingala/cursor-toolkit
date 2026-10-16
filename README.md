@@ -25,6 +25,14 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 
 **Bundled with FCD (not a separate plugin):** `backend-architect` skill + agent for Phase 2 APIs / Lambda / data / IAM.
 
+### Standalone skills (host publish)
+
+| Skill | Command | Notes |
+|-------|---------|--------|
+| **applaud-debug** | `/applaud-debug` | Aha ticket → stage repro → fix; needs **aha-video-understanding**, **graphify**, optional **stage-mongo** (local) |
+
+`bash install.sh` runs `scripts/install-applaud-debug.sh` so the skill and command land on Cursor, Claude, Codex, OpenCode, Antigravity, Zed, Kilo, Kimi, Qwen, and DeepSeek paths (see host matrix below).
+
 ### Not included
 
 - **stage-mongo** — credentials; keep local only
@@ -134,6 +142,7 @@ Skills are markdown; they **call** these tools. `bash install.sh` copies files. 
 | **global-tooling** | **headroom** (`uv tool install headroom-ai`), **ruflo** (`npm i -g ruflo`) |
 | **aws-diagnose** / **agents-*** | **python3**, **boto3**, **jq**; optional **aws** CLI, **agentcore** |
 | **aha-video-understanding** | **ffmpeg**, **openai-whisper**, **yt-dlp**, **tesseract**; MCP **aha-mcp** + **video-analyzer** |
+| **applaud-debug** | **node** + `npm i` in `skills/applaud-debug` for repro Playwright; **graphify**; **aha-video-understanding**; optional personal **stage-mongo** |
 | **graphify** | `uv tool install graphifyy` |
 | **agentmemory-*** / remember / recall / … | MCP **agentmemory** (`npx @agentmemory/mcp`) |
 | **codebase-doc-*** | **node** (bundled `.mjs` scripts) |
