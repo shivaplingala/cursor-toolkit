@@ -11,6 +11,7 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 | `plugins/` | Canonical Cursor plugins (source of truth) |
 | `skills/` | Standalone skill copies (backend, frontend, QA, Headroom, Ruflo, grill-me, graphify, …) |
 | `rules/` | Global Cursor rules (`.mdc`) |
+| `agents/opencode/` | OpenCode V2 agents for FCD/FCD-V2 + applaud-debug (25, free models, variant-tiered) |
 | `SCRIPT-OS-EXCLUSIONS.md` | Which `.sh` / `.py` run on Linux, macOS, Windows native |
 
 ### Plugins
@@ -30,6 +31,15 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 | Skill | Command | Notes |
 |-------|---------|--------|
 | **applaud-debug** | `/applaud-debug` | Aha ticket → stage repro → fix; needs **aha-video-understanding**, **graphify**, optional **stage-mongo** (local) |
+
+### OpenCode agents
+
+`agents/opencode/` holds 25 OpenCode V2 agents (markdown + frontmatter: mode, permissions,
+pinned free models with `#high` / `#xhigh` / `#max` variants by task size and context load)
+— the FCD/FCD-V2 delivery pipeline (`fcd/`), the applaud-debug pipeline (`applaud/`), and
+three standalone reviewers. `bash install.sh` syncs them to `~/.config/opencode/agents/`
+(override with `OPENCODE_AGENTS`); see `agents/opencode/README.md` for the full map and
+variant policy.
 
 `bash install.sh` runs `scripts/install-applaud-debug.sh` so the skill and command land on Cursor, Claude, Codex, OpenCode, Antigravity, Zed, Kilo, Kimi, Qwen, and DeepSeek paths (see host matrix below).
 

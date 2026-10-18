@@ -8,6 +8,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEST="${CURSOR_PLUGINS:-$HOME/.cursor/plugins/local}"
 SKILLS="${CURSOR_SKILLS:-$HOME/.cursor/skills}"
 RULES="${CURSOR_RULES:-$HOME/.cursor/rules}"
+AGENTS="${OPENCODE_AGENTS:-$HOME/.config/opencode/agents}"
 
 PLUGINS=(aws-diagnose fcd-v2 full-cycle-delivery global-tooling staff-engineering)
 
@@ -71,6 +72,12 @@ install_rules() {
   done
 }
 
+install_agents() {
+  [[ -d "$ROOT/agents/opencode" ]] || { echo "missing: $ROOT/agents/opencode" >&2; return 1; }
+  sync_tree "$ROOT/agents/opencode" "$AGENTS"
+  echo "agents  $AGENTS"
+}
+
 run_host_installers() {
   local fcd="$DEST/full-cycle-delivery"
   if [[ -f "$fcd/scripts/install-all-hosts.sh" ]]; then
@@ -101,6 +108,9 @@ check_install() {
   for name in grill-me grill-with-docs research-agent backend frontend qa playwright-qa staff-engineering; do
     [[ -f "$SKILLS/$name/SKILL.md" ]] || { echo "FAIL skill $name"; ok=1; }
   done
+  [[ -f "$AGENTS/fcd/orchestrator.md" && -f "$AGENTS/applaud/orchestrator.md" ]] || {
+    echo "FAIL opencode agents"; ok=1;
+  }
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {
     echo "WARN rules may be incomplete"
   }
@@ -112,7 +122,7 @@ check_install() {
 
 pack_from_local() {
   local name
-  mkdir -p "$ROOT/plugins" "$ROOT/skills" "$ROOT/rules"
+  mkdir -p "$ROOT/plugins" "$ROOT/skills" "$ROOT/rules" "$ROOT/agents/opencode"
   for name in "${PLUGINS[@]}"; do
     sync_tree "$DEST/$name" "$ROOT/plugins/$name"
   done
@@ -131,6 +141,7 @@ pack_from_local() {
     fi
   done
   cp -R "$RULES"/*.mdc "$ROOT/rules/" 2>/dev/null || true
+  [[ -d "$AGENTS" ]] && sync_tree "$AGENTS" "$ROOT/agents/opencode"
   echo "packed into $ROOT"
 }
 
@@ -143,6 +154,7 @@ case "${1:-}" in
     install_plugins
     install_skills
     install_rules
+    install_agents
     run_host_installers
     bash "$ROOT/scripts/install-applaud-debug.sh"
     echo
