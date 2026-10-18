@@ -34,12 +34,32 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 
 ### OpenCode agents
 
-`agents/opencode/` holds 25 OpenCode V2 agents (markdown + frontmatter: mode, permissions,
-pinned free models with `#high` / `#xhigh` / `#max` variants by task size and context load)
-— the FCD/FCD-V2 delivery pipeline (`fcd/`), the applaud-debug pipeline (`applaud/`), and
-three standalone reviewers. `bash install.sh` syncs them to `~/.config/opencode/agents/`
-(override with `OPENCODE_AGENTS`); see `agents/opencode/README.md` for the full map and
-variant policy.
+`agents/opencode/` holds 25 OpenCode V2 agents for the gated pipelines — markdown +
+frontmatter (`description`, `mode`, `color`, `model`, ordered `permissions`
+`{action, resource, effect}`, last match wins), body = system prompt.
+`bash install.sh` syncs them to `~/.config/opencode/agents/` (override with
+`OPENCODE_AGENTS`; `--check` gates on the orchestrator pair).
+
+| Group | Agents | Modes |
+|-------|--------|-------|
+| `fcd/` (16) | `orchestrator`, `plan-review-fix-loop`, `qa-fix-loop`, `review-fix-loop`, `knowledge-capture` · `architect` + `backend-architect` · `backend-implementer`, `frontend-implementer`, `implementer` · `spec-reviewer`, `coding-reviewer`, `impact-reviewer`, `quality-reviewer`, `pre-ship-reviewer` · `qa-engineer` | loops/knowledge-capture = `all`, workers = `subagent` |
+| `applaud/` (6) | `orchestrator` · `ticket-reader`, `stage-repro`, `local-matcher`, `fixer`, `repro-runner` | orchestrator = `all`, workers = `subagent` |
+| root (3) | `spec-reviewer`, `code-reviewer`, `impact-reviewer` | `all` |
+
+Pick an `all`-mode coordinator or reviewer as the session agent; workers run only as
+fresh-context subagents it dispatches. Reviewers and loops are edit/shell-denied or
+ask-gated (`impact-reviewer` may run only `graphify`); workers deny `git push/commit`;
+`local-matcher` alone can deploy serverless via `lsp` to personal stage `dev-lshiva`.
+Full role map and guardrail details: [`agents/opencode/README.md`](agents/opencode/README.md).
+
+**Free-model policy** — every agent pins a free OpenCode-hosted model; the variant reflects
+task size × context load and is never below `#high`:
+
+| Variant | Where |
+|---------|-------|
+| `#max` | whole-board / whole-repo context: `fcd/orchestrator`, `applaud/orchestrator`, `review-fix-loop`, `plan-review-fix-loop` (GLM-5.3-Flash Free); `impact-reviewer` (DeepSeek V4.1 Flash Free) |
+| `#xhigh` | small tasks, many touchpoints: `backend-implementer`, `implementer`, `fixer`, `qa-fix-loop`, `knowledge-capture` (GLM); `coding-reviewer`, `quality-reviewer`, `pre-ship-reviewer`, `backend-architect`, `architect`, `repro-runner` (DeepSeek); `qa-engineer`, `local-matcher` (Nemotron 3 Ultra Free); `ticket-reader`, `stage-repro` (Nemotron 3.5 Super VL Free) |
+| `#high` | scoped single-task: `spec-reviewer` (DeepSeek), `frontend-implementer` (Nemotron 3 Ultra Free) |
 
 `bash install.sh` runs `scripts/install-applaud-debug.sh` so the skill and command land on Cursor, Claude, Codex, OpenCode, Antigravity, Zed, Kilo, Kimi, Qwen, and DeepSeek paths (see host matrix below).
 
@@ -77,8 +97,9 @@ Health after install:
 1. Copies plugins into `~/.cursor/plugins/local/`
 2. Copies standalone skills into `~/.cursor/skills/`
 3. Copies rules into `~/.cursor/rules/`
-4. Runs `install-all-hosts.sh` so the same skills, commands, rules, and agents land on every supported host
-5. `--deps` installs CLIs; `--check` verifies files + those CLIs + MCP entries
+4. Syncs `agents/opencode/` into `~/.config/opencode/agents/` (OpenCode V2 agents)
+5. Runs `install-all-hosts.sh` so the same skills, commands, rules, and agents land on every supported host
+6. `--deps` installs CLIs; `--check` verifies files + those CLIs + MCP entries
 
 ## Hosts
 
@@ -99,7 +120,7 @@ One catalog: `plugins/full-cycle-delivery/scripts/lib/host-discovery.sh`.
 | **Qwen Code** | `~/.qwen/skills/` | `~/.qwen/commands/` | — |
 | **DeepSeek Harness** | `~/.dsh/skills/` and `~/.agents/skills/` | — | — |
 
-Agents copy to `~/.cursor/agents`, `~/.claude/agents`, `~/.agents/agents`, `~/.config/kilo/agent`.
+Agents copy to `~/.cursor/agents`, `~/.claude/agents`, `~/.agents/agents`, `~/.config/kilo/agent`; OpenCode agents sync to `~/.config/opencode/agents` via `install.sh`.
 
 Antigravity uses **real copies** (not symlinks). Re-run `bash install.sh` after plugin updates.
 
