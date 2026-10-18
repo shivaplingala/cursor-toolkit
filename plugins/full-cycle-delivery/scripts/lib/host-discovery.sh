@@ -199,7 +199,8 @@ hd_skill_link_roots() {
     "$HOME/.kimi-code/skills" \
     "$HOME/.qwen/skills" \
     "$HOME/.dsh/skills" \
-    "$HOME/.zcode/skills"
+    "$HOME/.zcode/skills" \
+    "$HOME/.hermes/skills"
 }
 
 hd_skill_copy_roots() {
