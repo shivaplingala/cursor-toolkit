@@ -1,0 +1,137 @@
+{
+  "run_ts": "2026-10-18T20:34:56Z",
+  "runner": "harness2-parity",
+  "checks": [
+    {
+      "id": "c1-systemprompt",
+      "component": "c1",
+      "desc": "always-on surface sized under the 24k cap; trigger/invariant structure present",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "/home/shiva/applaud/opencode-prompt-compact/all-models.txt: 4007 chars, cap 24000",
+        "agents: 25 bodies, all<=24000 chars",
+        "loose 'load X skill' refs: 2 [('/home/shiva/.config/opencode/agents/fcd/implementer.md:25', 'Implement one plan task. **Coding style: ponytail only** (load skill `ponytail`, intensity'), ('/home/shiva/cursor-toolkit/rules/fcd-v2.mdc:4', 'load skill fcd-v2. Never rewrite or replace the FCD v1 plugin.')]",
+        "canonical trigger lines: 0 (none; harness2 names this the most violated rule)",
+        "loose skill-load refs: 2 [('/home/shiva/.config/opencode/agents/fcd/implementer.md:25', 'Implement one plan task. **Coding style: ponytail only** (load skill `ponytail`, intensity'), ('/home/shiva/cursor-toolkit/rules/fcd-v2.mdc:4', 'load skill fcd-v2. Never rewrite or replace the FCD v1 plugin.')]",
+        "invariant/budget wording occurrences: (0, [])"
+      ]
+    },
+    {
+      "id": "c2-guardrails",
+      "component": "c2",
+      "desc": "deny/ask gates on dangerous ops + verify-order rules + centralized always-on guardrails surface",
+      "pass": true,
+      "score": 0.75,
+      "evidence": [
+        "git push/commit DENY gates: 13 e.g. applaud/fixer.md",
+        "git push/commit/gh-pr ASK gates: 3",
+        "static permission gates total: 68 (deny=59, ask=9)",
+        "verify-before-dispatch style occurrences: 9 e.g. /home/shiva/.config/opencode/agents/applaud/fixer.md:39",
+        "missing: /home/shiva/.config/opencode/guardrails.md (gates are scattered across 68 frontmatter blocks, no always-on guardrails.md)",
+        "precedence/order wording occurrences: 0 "
+      ]
+    },
+    {
+      "id": "c3-memory",
+      "component": "c3",
+      "desc": "structured, dated, integrated lesson library (not a loose markdown log)",
+      "pass": true,
+      "score": 0.75,
+      "evidence": [
+        "corpus: INDEX.md + topics build.md,debug.md,fix.md,log.md,performance.md,qa.md,swarm.md",
+        "dated entries in /home/shiva/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/knowledge/log.md: 6",
+        "agents referencing the corpus: 2 e.g. fcd/knowledge-capture.md",
+        "structured always-on lesson file(s): none; memory-MCP mentions in agent bodies: 0 (memory MCPs are configured in opencode.json but never referenced by procedure)"
+      ]
+    },
+    {
+      "id": "c4-tool-guidance",
+      "component": "c4",
+      "desc": "explicit tool rules with one canonical value, centralized vs scattered",
+      "pass": true,
+      "score": 0.75,
+      "evidence": [
+        "canonical loopback QA base occurrences: 30 e.g. /home/shiva/.config/opencode/agents/fcd/qa-engineer.md:43",
+        "conflicting loopback QA values: 0 ",
+        "lsp-related guidance occurrences: 29 e.g. /home/shiva/.config/opencode/agents/applaud/fixer.md:4",
+        "sst-stage guidance occurrences: 72 e.g. /home/shiva/.config/opencode/agents/applaud/local-matcher.md:5",
+        "missing: no tool_guidance.md under /home/shiva/.config/opencode; the loopback rule is duplicated across 12 files instead of one always-on surface"
+      ]
+    },
+    {
+      "id": "c5-subagents",
+      "component": "c5",
+      "desc": "subagent fleet share, thin orchestrator context, fenced read-only roles, self-contained briefs",
+      "pass": true,
+      "score": 0.891,
+      "evidence": [
+        "agents=25 mode:subagent=16 mode:all=9 (ratio 0.64)",
+        "orchestrators=2 thin-posture declarations=2 e.g. applaud/orchestrator.md",
+        "reviewer-named agents with deny gates: 8 e.g. code-reviewer.md",
+        "mode:subagent bodies self-contained: 9/16 e.g. fcd/architect.md"
+      ]
+    },
+    {
+      "id": "c6-skills",
+      "component": "c6",
+      "desc": "SKILL.md admissibility (name==dir, description, unique) + agent-side trigger lines",
+      "pass": true,
+      "score": 0.5,
+      "evidence": [
+        "skills scanned=239; name!=dir (unique): [('aws-diagnose-read', 'aws-readonly-diagnostics')]",
+        "skills missing description: none",
+        "canonical trigger lines ('When X, load the `y` skill'): 0 (none \u2014 untriggered skills are dead weight per harness2)",
+        "loose skill-load mentions: 2 [('/home/shiva/.config/opencode/agents/fcd/implementer.md:25', 'Implement one plan task. **Coding style: ponytail only** (load skill `ponytail`, intensity'), ('/home/shiva/cursor-toolkit/rules/fcd-v2.mdc:4', 'load skill fcd-v2. Never rewrite or replace the FCD v1 plugin.')]",
+        "distinct skill names: 44; conflicting same-name/different-desc: [('handoff', ['compact the current conversation into a handoff document for another agent to pick up.', 'resume the most recent agent session for the current working directory, leading with any unanswered question. use when the user says \"where were we\", \"resume\", \"handoff\", \"pick up where i left off\", or starts a session with no fresh context.'])]; duplicate descriptions across different names: none"
+      ]
+    },
+    {
+      "id": "c7-scripts",
+      "component": "c7",
+      "desc": "helpers ship near callers, invocations resolve, .py compiles, .sh executable",
+      "pass": true,
+      "score": 0.734,
+      "evidence": [
+        "shipped helper scripts: 55 e.g. .config/opencode/skills/applaud-debug/scripts/aha_intake.py",
+        "script refs in prompt text: 13 (e.g. ['./scripts/verify-scope.sh', '/.cursor/skills/aha-video-understanding/scripts/aha_list_comments.py', '/.cursor/skills/applaud-debug/scripts/aha_intake.py']); prose placeholders: 3; unresolved concrete refs: ['SKILL_DIR/scripts/query.sh', 'SKILL_ROOT/scripts/aha_download_images.py', 'SKILL_ROOT/scripts/aha_download_video.py', 'SKILL_ROOT/scripts/aha_list_comment_images.py', 'SKILL_ROOT/scripts/aha_list_comment_videos.py']",
+        ".py compiles: 23 ok, 0 bad",
+        ".sh executable: 22/32"
+      ]
+    },
+    {
+      "id": "c8-plugin",
+      "component": "c8",
+      "desc": "in-loop enforcement lever (OpenCode plugin / middleware) present and handling a recurring tool-loop failure",
+      "pass": false,
+      "score": 0.25,
+      "evidence": [
+        "/home/shiva/.config/opencode/plugin: missing (no plugins installed)",
+        "plugin config key in opencode.json: absent",
+        ".ts enforcement/plugin files: none",
+        "static permission gates: deny=59, ask=9 \u2014 these are the ONLY tool-level enforcement present (static deny/ask, no in-loop middleware)"
+      ]
+    }
+  ],
+  "summary": {
+    "per_component_avg": {
+      "c1": 1.0,
+      "c2": 0.75,
+      "c3": 0.75,
+      "c4": 0.75,
+      "c5": 0.891,
+      "c6": 0.5,
+      "c7": 0.734,
+      "c8": 0.25
+    },
+    "total_score": 0.703,
+    "passed": 7,
+    "failed": 1,
+    "skipped": 0,
+    "n_checks": 8,
+    "failed_ids": [
+      "c8-plugin"
+    ],
+    "skipped_ids": []
+  }
+}

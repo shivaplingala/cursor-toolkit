@@ -1,5 +1,5 @@
 ---
-name: aws-readonly-diagnostics
+name: aws-diagnose-read
 description: >-
   Debug and diagnose AWS issues using READ-ONLY access. Use this skill whenever
   the user wants to investigate, debug, troubleshoot, or root-cause a problem in

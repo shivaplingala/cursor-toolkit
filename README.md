@@ -12,7 +12,8 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 | `skills/` | Standalone skill copies (backend, frontend, QA, Headroom, Ruflo, grill-me, graphify, …) |
 | `rules/` | Global Cursor rules (`.mdc`) |
 | `agents/opencode/` | OpenCode V2 agents for FCD/FCD-V2 + applaud-debug (25, free models, variant-tiered) |
-| `SCRIPT-OS-EXCLUSIONS.md` | Which `.sh` / `.py` run on Linux, macOS, Windows native |
+| `opencode/` | OpenCode always-on harness: global `AGENTS.md` (skill triggers, tool guidance, guardrails, memory beats) + `plugins/` (budget-guard enforcement) |
+| `SCRIPT-OS-EXCLUSIONS.md` | Which `.sh` / `.py` / `.ps1` run on Linux, macOS, Windows native |
 
 ### Plugins
 

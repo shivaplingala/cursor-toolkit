@@ -76,6 +76,15 @@ install_agents() {
   [[ -d "$ROOT/agents/opencode" ]] || { echo "missing: $ROOT/agents/opencode" >&2; return 1; }
   sync_tree "$ROOT/agents/opencode" "$AGENTS"
   echo "agents  $AGENTS"
+  local oc home
+  oc="$ROOT/opencode"
+  home="$(dirname "$AGENTS")"
+  [[ -f "$oc/AGENTS.md" ]] && cp -R "$oc/AGENTS.md" "$home/AGENTS.md" && echo "agents  $home/AGENTS.md"
+  if [[ -d "$oc/plugins" ]]; then
+    mkdir -p "$home/plugins"
+    cp -R "$oc/plugins/." "$home/plugins/"
+    echo "agents  $home/plugins/"
+  fi
 }
 
 run_host_installers() {
@@ -111,6 +120,10 @@ check_install() {
   [[ -f "$AGENTS/fcd/orchestrator.md" && -f "$AGENTS/applaud/orchestrator.md" ]] || {
     echo "FAIL opencode agents"; ok=1;
   }
+  local ocd="$(dirname "$AGENTS")"
+  [[ -f "$ocd/AGENTS.md" && -f "$ocd/plugins/budget-guard.js" ]] || {
+    echo "FAIL opencode AGENTS.md/plugin"; ok=1;
+  }
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {
     echo "WARN rules may be incomplete"
   }
@@ -141,6 +154,9 @@ pack_from_local() {
     fi
   done
   cp -R "$RULES"/*.mdc "$ROOT/rules/" 2>/dev/null || true
+  local ocd="$(dirname "$AGENTS")"
+  [[ -f "$ocd/AGENTS.md" ]] && cp -R "$ocd/AGENTS.md" "$ROOT/opencode/AGENTS.md"
+  [[ -d "$ocd/plugins" ]] && mkdir -p "$ROOT/opencode/plugins" && cp -R "$ocd/plugins/." "$ROOT/opencode/plugins/"
   [[ -d "$AGENTS" ]] && sync_tree "$AGENTS" "$ROOT/agents/opencode"
   echo "packed into $ROOT"
 }
