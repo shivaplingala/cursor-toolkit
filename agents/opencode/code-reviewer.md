@@ -54,3 +54,28 @@ Canonical prompt pack (read for full checklist when reachable):
 
 `STATUS: PASS` with `FINDING_COUNT: 0`, or numbered findings, each:
 `SEVERITY · file:line · issue · why it matters · suggested fix`.
+
+## Findings self-verification (mandatory, before emitting)
+
+Draft findings first, then switch role: you are now a hostile verifier of your own list.
+Never trust the drafting pass — reopen every cited file:line from disk, reread the plan
+task line / acceptance criterion each finding maps to, and ask what would disprove it.
+Classify each finding:
+
+- `VERIFIED` — code re-checks and the plan/spec mapping is correct. Keep.
+- `REFUTED` — misread, already handled, or wrong line. Drop from the numbered list;
+  keep visible as `REFUTED: <one-line story>`.
+- `MISALIGNED` — true about the code, but the plan or spec explicitly requires or
+  defers it. Not a code finding: FAIL the plan/spec line (quote it) or downgrade with
+  the quote, and say which.
+- `STALE` — current code/plan/spec no longer matches the evidence. Drop; note stale.
+- `UNSUPPORTED` — cannot re-produce the evidence (line moved, output missing). Keep,
+  tag `UNSUPPORTED`.
+
+Mismatch scan (three ways, every round): code ↔ plan task, code ↔ spec/ACs,
+plan ↔ spec. A plan/spec contradiction is itself a finding against the plan text —
+surface it, never silently align to either side. In re-reviews, confirm each prior fix
+actually sits at the cited location (a fix that moved counts as STALE).
+
+Emit last: `VERIFICATION: <v> verified · <r> refuted · <m> misaligned · <s> stale · <u> unsupported`.
+`FINDING_COUNT` = verified + misaligned + unsupported only.

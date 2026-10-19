@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to "review since X".
+description: Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents, then verifies received findings as a fresh skeptic against code and spec (labels VERIFIED / REFUTED / MISALIGNED / UNSUPPORTED, surfaces spec-code mismatches), before reporting side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to "review since X".
 ---
 
 # Review
@@ -62,11 +62,32 @@ Send a single message with two `Agent` tool calls. Use the `general-purpose` sub
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
-### 5. Aggregate
+### 5. Verify the findings as a fresh skeptic
 
-Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate so the user can see them independently.
+Do **not** aggregate straight away. When both sub-agent reports come back, switch role:
+you are now a hostile verifier of everything they claimed. For each finding separately:
 
-End with a one-line summary: total findings per axis, and the worst single issue (if any) flagged.
+- Re-open the cited hunk yourself (`git diff <fixed-point>...HEAD -- <file>` or read the
+  file at the cited lines). Never trust the sub-agent's quote — re-quote from the source.
+- Re-read the spec / standard line it maps to, in full context (the surrounding
+  section may contradict the quoted sentence).
+- Label the finding:
+  - `VERIFIED` — reproduces against the source. Keep.
+  - `REFUTED` — misquote, misread, or wrong hunk. Drop from the report.
+  - `MISALIGNED` — technically true, but another part of the spec/standard explicitly
+    allows or requires the behavior. Quote both conflicting lines and flag the
+    **contradiction inside the spec/standard itself** — mismatches between reviews,
+    spec, and code are findings in their own right.
+  - `UNSUPPORTED` — cannot reproduce (file moved, diff incomplete). Keep, tagged.
+
+List dropped items under `### Refuted during verification` (one line each) so the user
+can audit the cleanup — silent deletion is not allowed.
+
+### 6. Aggregate
+
+Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned, with each finding labeled from the verification pass. Do **not** merge or rerank findings — the two axes are deliberately separate so the user can see them independently.
+
+End with a one-line summary: total findings per axis (with `VERIFIED`/`UNSUPPORTED` split), refuted count, and the worst single issue (if any) flagged.
 
 ## Why two axes
 

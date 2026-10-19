@@ -20,6 +20,7 @@ every situation below should end with the named skill loaded, not improvised:
 - When debugging an Aha ticket → per-ticket: read description/comments; stage repro; match the deployed branch; fix → load the `applaud-debug` skill.
 - When an AWS issue must be investigated (logs, metrics, CloudTrail) → load the `aws-diagnose-read` skill. READ-ONLY.
 - When the user says "recall", "what did we do about", or needs past-session context → load the `recall` skill.
+- When review reports (code/spec/impact) contain findings that must be re-audited against the plan, code, and spec, or reviewers disagree → load the `verify-reviews` skill; for the agent form dispatch `fcd/reviews-verifier`.
 - When MongoDB Local/Dev/Stage queries are needed → load the `mongo-connection` skill; stage-specific → `stage-mongo`.
 
 ## Tool guidance

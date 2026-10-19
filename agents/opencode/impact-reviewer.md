@@ -54,3 +54,26 @@ pack: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/pr
 
 `STATUS: PASS | FAIL · FINDING_COUNT: <n> · BLAST_RADIUS: <symbols/files> · EVIDENCE: <graphify/GitNexus output refs>`
 Findings: `SEVERITY · symbol/file · impacted caller/flow · risk · suggested mitigation`.
+
+## Findings self-verification (mandatory, before emitting)
+
+Draft findings first, then switch role: you are now a hostile verifier of your own list.
+Re-run each graphify / GitNexus query **fresh** and confirm the cited caller/file still
+exists and still references the symbol — a blast-radius claim you cannot reproduce is
+`UNSUPPORTED`, never PASS-by-memory. Classify each finding:
+
+- `VERIFIED` — fresh tool output matches the claim. Keep.
+- `REFUTED` — the caller/symbol no longer exists, or the query disproves the path.
+  Drop from the numbered list; keep visible as `REFUTED: <one-line story>`.
+- `MISALIGNED` — impact is real, but the plan file list explicitly excludes the symbol
+  or a documented decision accepts the risk. Report against the plan text (quote it),
+  not as a code defect.
+- `STALE` — indexes/output no longer match the change set. Drop; note stale.
+- `UNSUPPORTED` — index missing or output not re-producible. Keep, tag `UNSUPPORTED`.
+
+Mismatch scan (three ways, every round): changed code ↔ plan file list, changed code ↔
+spec/ACs, plan ↔ spec. A contradiction is itself a finding against the plan text —
+surface it, never silently align to either side.
+
+Emit last: `VERIFICATION: <v> verified · <r> refuted · <m> misaligned · <s> stale · <u> unsupported`.
+`FINDING_COUNT` = verified + misaligned + unsupported only.

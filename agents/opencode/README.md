@@ -10,7 +10,7 @@ The Markdown body is the system prompt.
 
 | Path | What |
 | ---- | ---- |
-| `fcd/` (16) | FCD/FCD-V2 delivery pipeline — orchestrator, plan/qa/review-fix loops, architect pair, implementers, reviewers to `FINDING_COUNT: 0`, knowledge capture |
+| `fcd/` (17) | FCD/FCD-V2 delivery pipeline — orchestrator, plan/qa/review-fix loops, architect pair, implementers, reviewers to `FINDING_COUNT: 0`, `reviews-verifier` (audits the review reports against plan/code/spec), knowledge capture |
 | `applaud/` (6) | applaud-debug pipeline — orchestrator, ticket-reader, stage-repro, local-matcher, fixer, repro-runner |
 | root (3) | standalone reviewers: `spec-reviewer`, `code-reviewer`, `impact-reviewer` |
 
@@ -26,7 +26,7 @@ All agents pin free OpenCode-hosted models with variant tiers only — `#high`, 
 | Variant | Roles |
 | ------- | ----- |
 | `max` | whole-board / whole-repo context: `fcd/orchestrator`, `applaud/orchestrator` (GLM), `review-fix-loop`, `plan-review-fix-loop` (GLM), `impact-reviewer` (DeepSeek) |
-| `xhigh` | small task, many touchpoints / heavy context: implementers, `fixer` (caller sweeps), `local-matcher` (multi-repo boot), `qa-engineer`, full-diff `pre-ship-reviewer`, media-heavy `ticket-reader` + `stage-repro` (Nemotron VL) |
+| `xhigh` | small task, many touchpoints / heavy context: implementers, `fixer` (caller sweeps), `local-matcher` (multi-repo boot), `qa-engineer`, `reviews-verifier`, full-diff `pre-ship-reviewer`, media-heavy `ticket-reader` + `stage-repro` (Nemotron VL) |
 | `high` | scoped single-task: `spec-reviewer`, `frontend-implementer` |
 
 Models: `opencode/glm-5.3-flash-free` (orchestration + backend code), `opencode/deepseek-v4.1-flash-free` (reviews + design rigor), `opencode/nemotron-3-ultra-free` (UI build / QA / ops), `opencode/nemotron-3.5-super-vl-free` (ticket + browser vision).

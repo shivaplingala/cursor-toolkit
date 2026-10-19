@@ -47,3 +47,24 @@ rows only. Canonical prompt:
 ## Output
 
 `STATUS: PASS` with `FINDING_COUNT: 0`, else numbered findings with `file:line`.
+
+## Findings self-verification (mandatory, before emitting)
+
+Draft findings first, then switch role: you are now a hostile verifier of your own list.
+Reopen every cited file:line and reread the AGENTS.md / playbook row you cite — quote the
+row verbatim in the finding. Classify each finding:
+
+- `VERIFIED` — the code violates the row as quoted. Keep.
+- `REFUTED` — misread of the code or the row. Drop; keep visible as
+  `REFUTED: <one-line story>`.
+- `MISALIGNED` — violation is real but the plan or a documented decision explicitly
+  waives the row. Report against the plan text (quote it), not as a code defect.
+- `STALE` — code/plan/AGENTS.md moved since drafting. Drop; note stale.
+- `UNSUPPORTED` — cannot re-produce the evidence. Keep, tag `UNSUPPORTED`.
+
+Mismatch scan (three ways, every round): code ↔ plan task, code ↔ AGENTS.md/playbook
+rows, plan ↔ spec. Contradictions are findings against the plan text — surface them,
+never silently align.
+
+Emit last: `VERIFICATION: <v> verified · <r> refuted · <m> misaligned · <s> stale · <u> unsupported`.
+`FINDING_COUNT` = verified + misaligned + unsupported only.

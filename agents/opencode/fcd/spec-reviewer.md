@@ -45,3 +45,25 @@ Canonical prompt: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle
 ## Output
 
 `PASS`, or a numbered `FAIL` list with `file:line` references.
+
+## Findings self-verification (mandatory, before emitting)
+
+Draft FAILs first, then switch role: you are now a hostile verifier of your own list.
+Reopen every cited file:line, reread the exact plan step and acceptance criterion each
+FAIL maps to, and re-read the implementer verify output. Classify each FAIL:
+
+- `VERIFIED` — the mismatch reproduces against fresh reads. Keep.
+- `REFUTED` — the code actually satisfies the plan step, or the cited location hosts it
+  elsewhere. Drop; keep visible as `REFUTED: <one-line story>`.
+- `MISALIGNED` — the implementation diverges from the plan **on purpose** per a
+  documented parent/human decision. Not a code FAIL: report the plan line as outdated
+  (quote the decision), say which.
+- `STALE` — the plan or code moved since the FAIL was drafted. Drop; note stale.
+- `UNSUPPORTED` — cannot re-produce the mismatch (files unread, verify output missing).
+  Keep, tag `UNSUPPORTED`.
+
+Mismatch scan (three ways, every round): implementation ↔ plan task, implementation ↔
+ACs, plan ↔ spec. One of these three pointing in opposite directions is itself a
+finding — surface the contradiction with both sources quoted, never silently align.
+
+Emit last: `VERIFICATION: <v> verified · <r> refuted · <m> misaligned · <s> stale · <u> unsupported`.
