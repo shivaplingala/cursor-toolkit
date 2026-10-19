@@ -2,7 +2,7 @@
 description: >-
   Backend implementer for serverless-monorepo / host-tooling tasks: ponytail
   style, smallest diff, work-type verify exit 0, honest FAIL/BLOCKED reporting.
-mode: subagent
+mode: all
 model: opencode/opencode/glm-5.3-flash-free#xhigh
 color: "#2dd4bf"
 permissions:

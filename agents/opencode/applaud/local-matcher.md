@@ -4,7 +4,7 @@ description: >-
   stage-deployed branch in each repo, dirty-tree stop-and-ask, boot only the
   apps the ticket needs, and deploy serverless via lsp dev-lshiva (npm run dev
   / sst dev forbidden in applaud-serverless; UI boots via npm run dev).
-mode: subagent
+mode: all
 model: opencode/opencode/nemotron-3-ultra-free#xhigh
 color: "#2dd4bf"
 permissions:

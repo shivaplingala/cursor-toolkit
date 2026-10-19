@@ -2,7 +2,7 @@
 description: >-
   Vue 3 + TypeScript frontend implementer for ui-vue3-app UI tasks: ponytail,
   read-first, verify via test:unit / test:e2e, honest verify reporting.
-mode: subagent
+mode: all
 model: opencode/opencode/nemotron-3-ultra-free#high
 color: "#84cc16"
 permissions:

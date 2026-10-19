@@ -3,7 +3,7 @@ description: >-
   QA engineer for FCD: test-case catalog, Playwright id map, localhost gate,
   smoke execution, FAIL_LIST sidecars, defect filing, and sign-off. Not a
   product implementer.
-mode: subagent
+mode: all
 model: opencode/opencode/nemotron-3-ultra-free#xhigh
 color: "#f43f5e"
 permissions:

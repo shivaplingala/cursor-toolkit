@@ -3,7 +3,7 @@ description: >-
   Senior backend architect for FCD Phase 2: APIs, data models, Lambda/IAM,
   queues, observability, security, reliability. Design only — hands off to
   backend-implementer for code. Strategic, security-first.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#3b82f6"
 permissions:

@@ -2,7 +2,7 @@
 description: >-
   Generic FCD implementer for one plan task: ponytail-only coding style,
   work-type verify exit 0, honest reporting, no product or security guesses.
-mode: subagent
+mode: all
 model: opencode/opencode/glm-5.3-flash-free#xhigh
 color: "#65a30d"
 permissions:

@@ -3,7 +3,7 @@ description: >-
   Applaud verify gate: run the same Playwright spec on local and on stage after
   the fix — bug assertion must fail before, pass after — with network, ws, and
   console capture in the same window as process logs. Gate only; never edits.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#0e7490"
 permissions:

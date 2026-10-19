@@ -3,7 +3,7 @@ description: >-
   Read-only PR-readiness reviewer: all plan tasks checked, verify-scope green,
   quality run output, review-matrix rows, no secrets, CI mirrors local verify.
   SHIP READY or BLOCKED with numbered items — never edits or merges.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#0e7490"
 permissions:

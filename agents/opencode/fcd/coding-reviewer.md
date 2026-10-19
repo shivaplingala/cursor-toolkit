@@ -3,7 +3,7 @@ description: >-
   Expert read-only code reviewer (diff or Phase 3 plan): correctness, security,
   maintainability, performance, and branch/test coverage. Mentor tone —
   specific, actionable, educational. Reports to parent; never edits.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#8e4ec6"
 permissions:

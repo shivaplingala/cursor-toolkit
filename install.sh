@@ -8,6 +8,7 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 DEST="${CURSOR_PLUGINS:-$HOME/.cursor/plugins/local}"
 SKILLS="${CURSOR_SKILLS:-$HOME/.cursor/skills}"
 RULES="${CURSOR_RULES:-$HOME/.cursor/rules}"
+CURSOR_AGENTS="${CURSOR_AGENTS:-$HOME/.cursor/agents}"
 AGENTS="${OPENCODE_AGENTS:-$HOME/.config/opencode/agents}"
 
 PLUGINS=(aws-diagnose fcd-v2 full-cycle-delivery global-tooling staff-engineering)
@@ -85,6 +86,10 @@ install_agents() {
     cp -R "$oc/plugins/." "$home/plugins/"
     echo "agents  $home/plugins/"
   fi
+  if [[ -d "$ROOT/agents/cursor" ]]; then
+    sync_tree "$ROOT/agents/cursor" "$CURSOR_AGENTS"
+    echo "agents  $CURSOR_AGENTS"
+  fi
 }
 
 run_host_installers() {
@@ -127,6 +132,9 @@ check_install() {
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {
     echo "WARN rules may be incomplete"
   }
+  [[ -f "$CURSOR_AGENTS/reviews-verifier.md" && -f "$CURSOR_AGENTS/coding-reviewer.md" ]] || {
+    echo "FAIL cursor agents"; ok=1;
+  }
   echo
   bash "$ROOT/scripts/deps.sh" --check || ok=1
   bash "$ROOT/scripts/install-applaud-debug.sh" --check || ok=1
@@ -158,6 +166,7 @@ pack_from_local() {
   [[ -f "$ocd/AGENTS.md" ]] && cp -R "$ocd/AGENTS.md" "$ROOT/opencode/AGENTS.md"
   [[ -d "$ocd/plugins" ]] && mkdir -p "$ROOT/opencode/plugins" && cp -R "$ocd/plugins/." "$ROOT/opencode/plugins/"
   [[ -d "$AGENTS" ]] && sync_tree "$AGENTS" "$ROOT/agents/opencode"
+  [[ -d "$CURSOR_AGENTS" ]] && mkdir -p "$ROOT/agents/cursor" && sync_tree "$CURSOR_AGENTS" "$ROOT/agents/cursor"
   echo "packed into $ROOT"
 }
 

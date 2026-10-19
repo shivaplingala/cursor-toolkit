@@ -3,7 +3,7 @@ description: >-
   General designer for FCD Phase 2: cross-cutting design before implementation
   plans — two options + verdict, ADR draft, failure modes. Backend
   APIs/Lambda/data/IAM go to fcd/backend-architect instead. Design only.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#6366f1"
 permissions:

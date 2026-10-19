@@ -4,7 +4,7 @@ description: >-
   first (cloud/UI/lsp commands), with every other caller of changed code
   enumerated and checked. Never verified on stage by itself — hands to
   repro-runner. Honest BLOCKED reporting for product/security decisions.
-mode: subagent
+mode: all
 model: opencode/opencode/glm-5.3-flash-free#xhigh
 color: "#65a30d"
 permissions:

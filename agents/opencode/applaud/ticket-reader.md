@@ -3,7 +3,7 @@ description: >-
   Aha ticket intake for Applaud debug: description, comments, requirements, ACs,
   history, attachments (text→media in order), then a repro note. Credentials
   never printed; temp downloads deleted after understanding.
-mode: subagent
+mode: all
 model: opencode/opencode/nemotron-3.5-super-vl-free#xhigh
 color: "#8e4ec6"
 permissions:

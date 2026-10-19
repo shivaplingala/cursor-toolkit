@@ -4,7 +4,7 @@ description: >-
   against the code, the plan, and the spec, re-runs impact evidence, cross-checks
   reviewers against each other, flags plan/spec mismatches. Scores reviewer
   accuracy. Never edits.
-mode: subagent
+mode: all
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#b8552e"
 permissions:
