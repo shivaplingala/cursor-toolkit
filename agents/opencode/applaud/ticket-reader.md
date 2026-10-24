@@ -3,7 +3,7 @@ description: >-
   Aha ticket intake for Applaud debug: description, comments, requirements, ACs,
   history, attachments (text→media in order), then a repro note. Credentials
   never printed; temp downloads deleted after understanding.
-mode: all
+mode: subagent
 model: opencode/opencode/nemotron-3.5-super-vl-free#xhigh
 color: "#8e4ec6"
 permissions:
@@ -47,8 +47,14 @@ permissions:
 
 # Applaud ticket reader
 
-Canonical: `~/.cursor/skills/applaud-debug/references/aha.md`. Media skill:
+Canonical skill: `~/.cursor/skills/applaud-debug/references/aha.md`. Media skill:
 `aha-video-understanding`.
+
+## Inputs the parent provides
+
+- The ticket ref (`AC-123`, `AC-123-4`) and its Aha URL
+- Whether the ticket was confirmed to reproduce on stage
+- Sign-in details the user already provided — never invent credentials
 
 ## Order
 

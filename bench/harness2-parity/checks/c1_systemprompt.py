@@ -1,6 +1,7 @@
-"""c1 systemprompt — global AGENTS.md exists, under the 24k always-on cap, and the
-previously dead ~/.config/opencode/rules/*.md actually load via opencode.json
-instructions (verified: rules appeared as always-on instructions after wiring).
+"""c1 systemprompt — the always-on surface (global AGENTS.md + live rules/*.md) exists,
+fits the 24k always-on cap as a whole, and the previously dead ~/.config/opencode/rules/*.md
+actually load via opencode.json instructions (verified: rules appeared as always-on
+instructions after wiring).
 """
 import os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -9,14 +10,17 @@ import benchlib as B
 def main():
     ev, score, n = [], 0.0, 0
 
+    files = B.always_on_paths()
+    total = sum(os.path.getsize(p) for p in files if os.path.isfile(p))
     if os.path.isfile(B.AGENTS_MD):
-        size = os.path.getsize(B.AGENTS_MD)
-        score += 1.0 if size <= B.ALWAYS_ON_MAX else (0.5 if size <= B.ALWAYS_ON_MAX * 1.5 else 0.0)
-        n += 1
-        ev.append(f"global AGENTS.md: {size} chars of {B.ALWAYS_ON_MAX} cap")
+        score += 1.0 if total <= B.ALWAYS_ON_MAX else (0.5 if total <= B.ALWAYS_ON_MAX * 1.5 else 0.0)
+        ev.append(f"always-on payload (AGENTS.md + live rules): {total} chars of "
+                  f"{B.ALWAYS_ON_MAX} cap ({len(files)} file(s))")
     else:
-        n += 1
-        ev.append("global AGENTS.md: missing")
+        score += 0.0
+        ev.append(f"always-on payload: {total} chars of {B.ALWAYS_ON_MAX} cap — "
+                  "global AGENTS.md MISSING")
+    n += 1
 
     instructions_wired = False
     if os.path.isfile(B.CFG):

@@ -32,8 +32,15 @@ permissions:
 
 # Plan review → fix loop owner (main agent protocol)
 
-You are the coordinator: reviewers are read-only, **you** edit the plan. Canonical protocol:
+You are the coordinator: reviewers are read-only, **you** edit the plan. Canonical prompt:
 `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/plan-review-fix-loop.md`
+
+## Inputs the parent provides
+
+- Plan path + plan text (or the exact range under review)
+- The planned file/symbol list — an empty list is a finding, never a PASS
+- Prior round findings and what changed since (on a re-review)
+- Phase state: research + grill-me + grill-with-docs reported complete
 
 ## When
 

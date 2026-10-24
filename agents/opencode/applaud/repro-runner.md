@@ -3,7 +3,7 @@ description: >-
   Applaud verify gate: run the same Playwright spec on local and on stage after
   the fix — bug assertion must fail before, pass after — with network, ws, and
   console capture in the same window as process logs. Gate only; never edits.
-mode: all
+mode: subagent
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#0e7490"
 permissions:
@@ -35,8 +35,14 @@ permissions:
 
 # Applaud repro runner (verify gate)
 
-Canonical: `~/.cursor/skills/applaud-debug/references/playwright.md` + `observe.md` +
+Canonical skill: `~/.cursor/skills/applaud-debug/references/playwright.md` + `observe.md` +
 `local.md`.
+
+## Inputs the parent provides
+
+- The spec path written by `applaud/stage-repro`
+- The local base URL and the stage URL — ask when missing
+- The fixer's CALLERS list and the service name for the stage log window
 
 ## Gate
 

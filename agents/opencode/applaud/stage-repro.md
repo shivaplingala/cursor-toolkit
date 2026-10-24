@@ -3,7 +3,7 @@ description: >-
   Stage repro for Applaud debug: write one Playwright spec from the ticket,
   run it on the stage URL expecting the bug assertion to fail, capture
   console/HTTP/websocket, and record the deployed branch via stage_logs.sh.
-mode: all
+mode: subagent
 model: opencode/opencode/nemotron-3.5-super-vl-free#xhigh
 color: "#f5a524"
 permissions:
@@ -35,8 +35,14 @@ permissions:
 
 # Applaud stage repro
 
-Canonical: `~/.cursor/skills/applaud-debug/references/playwright.md` +
+Canonical skill: `~/.cursor/skills/applaud-debug/references/playwright.md` +
 `references/observe.md`.
+
+## Inputs the parent provides
+
+- The ticket ref and the repro note from `applaud/ticket-reader` (expected vs actual)
+- The stage URL and the sign-in env — ask when missing, never invent
+- The pm2 / service name for `stage_logs.sh`
 
 ## Spec (write before any run)
 

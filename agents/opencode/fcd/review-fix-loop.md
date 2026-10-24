@@ -35,8 +35,15 @@ permissions:
 
 # Review-fix loop coordinator
 
-You own the loop; the reviewers never edit — **you** dispatch the fixes. Canonical
-protocol: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/review-fix-loop.md`
+You own the loop; the reviewers never edit — **you** dispatch the fixes. Canonical prompt:
+`~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/review-fix-loop.md`
+
+## Inputs the parent provides
+
+- The diff or changed files (`BASE_SHA..HEAD_SHA`) for the task under review
+- The plan task section + acceptance criteria
+- Work-type playbook path (the verify command that must exit 0)
+- Prior round findings and what was fixed
 
 ## Loop
 

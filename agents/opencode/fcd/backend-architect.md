@@ -28,6 +28,16 @@ You are **Backend Architect** — databases, APIs, cloud, scale. Load for full p
 `~/.cursor/skills/backend-architect/SKILL.md`), plus the parent's dispatch brief
 (`prompts/backend-architect.md`) and work-type playbook excerpt.
 
+Canonical prompt:
+`~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/backend-architect.md`
+
+## Inputs the parent provides
+
+- The subsystem in scope and the constraint envelope (scale, tenancy, latency, budget)
+- The problem statement + the failure modes the design must answer
+- Repo / workspace paths to read (services, existing ADRs)
+- The phase, and whether ADR writes are authorized (edit is ask-gated)
+
 ## Deliverables
 
 - Two options with trade-offs + an ADR + failure modes

@@ -35,23 +35,27 @@ Repo: [github.com/shivaplingala/cursor-toolkit](https://github.com/shivaplingala
 
 ### OpenCode agents
 
-`agents/opencode/` holds 25 OpenCode V2 agents for the gated pipelines — markdown +
+`agents/opencode/` holds 26 OpenCode V2 agents for the gated pipelines — markdown +
 frontmatter (`description`, `mode`, `color`, `model`, ordered `permissions`
 `{action, resource, effect}`, last match wins), body = system prompt.
 `bash install.sh` syncs them to `~/.config/opencode/agents/` (override with
-`OPENCODE_AGENTS`; `--check` gates on the orchestrator pair).
+`OPENCODE_AGENTS`; `--check` gates on the orchestrator pair and on every plugin in
+`opencode/plugins/` being installed live).
 
 | Group | Agents | Modes |
 |-------|--------|-------|
-| `fcd/` (16) | `orchestrator`, `plan-review-fix-loop`, `qa-fix-loop`, `review-fix-loop`, `knowledge-capture` · `architect` + `backend-architect` · `backend-implementer`, `frontend-implementer`, `implementer` · `spec-reviewer`, `coding-reviewer`, `impact-reviewer`, `quality-reviewer`, `pre-ship-reviewer` · `qa-engineer` | loops/knowledge-capture = `all`, workers = `subagent` |
+| `fcd/` (17) | `orchestrator`, `plan-review-fix-loop`, `qa-fix-loop`, `review-fix-loop`, `knowledge-capture` · `architect` + `backend-architect` · `backend-implementer`, `frontend-implementer`, `implementer` · `spec-reviewer`, `coding-reviewer`, `impact-reviewer`, `quality-reviewer`, `pre-ship-reviewer`, `reviews-verifier` · `qa-engineer` | loops/knowledge-capture = `all`, workers + reviewers = `subagent` |
 | `applaud/` (6) | `orchestrator` · `ticket-reader`, `stage-repro`, `local-matcher`, `fixer`, `repro-runner` | orchestrator = `all`, workers = `subagent` |
-| root (3) | `spec-reviewer`, `code-reviewer`, `impact-reviewer` | `all` |
+| root (3) | `spec-reviewer`, `code-reviewer`, `impact-reviewer` | `subagent` |
 
-Pick an `all`-mode coordinator or reviewer as the session agent; workers run only as
-fresh-context subagents it dispatches. Reviewers and loops are edit/shell-denied or
+Pick an `all`-mode coordinator as the session agent; workers and reviewers run only
+as fresh-context subagents it dispatches. Reviewers are `subagent`-only by policy —
+a read-only auditor must never be selectable as the main session agent
+(`bench/harness2-parity/checks/c5_subagents.py` fails the build if one is `all`).
+Reviewers and loops are edit/shell-denied or
 ask-gated (`impact-reviewer` may run only `graphify`); workers deny `git push/commit`;
 `local-matcher` alone can deploy serverless via `lsp` to personal stage `dev-lshiva`.
-Full role map and guardrail details: [`agents/opencode/README.md`](agents/opencode/README.md).
+Full role map and guardrail details: [`agents/README.md`](agents/README.md).
 
 **Free-model policy** — every agent pins a free OpenCode-hosted model; the variant reflects
 task size × context load and is never below `#high`:
@@ -99,8 +103,35 @@ Health after install:
 2. Copies standalone skills into `~/.cursor/skills/`
 3. Copies rules into `~/.cursor/rules/`
 4. Syncs `agents/opencode/` into `~/.config/opencode/agents/` (OpenCode V2 agents)
-5. Runs `install-all-hosts.sh` so the same skills, commands, rules, and agents land on every supported host
-6. `--deps` installs CLIs; `--check` verifies files + those CLIs + MCP entries
+5. Copies `opencode/AGENTS.md` + `opencode/plugins/` into `~/.config/opencode/`
+6. Installs the **pre-commit harness gate** into `.git/hooks/pre-commit`
+7. Runs `install-all-hosts.sh` so the same skills, commands, rules, and agents land on every supported host
+8. `--deps` installs CLIs; `--check` verifies files + every opencode plugin + those CLIs + MCP entries
+
+## Harness gate (harness2-parity bench)
+
+`bench/harness2-parity/` grades this toolkit's OpenCode setup against the eight
+Harness² levers plus two local checks (install parity, runtime load). Ten checks,
+deterministic, no model calls.
+
+```bash
+bash bench/harness2-parity/runner.sh          # score + table, writes a result file
+bash scripts/bench-verify.sh                   # gate: exits non-zero when red
+python3 bench/harness2-parity/compare.py A.json B.json   # diff two runs
+```
+
+Enforcement, so a green score is not optional:
+
+| Where | What it does |
+| ----- | ------------ |
+| `scripts/bench-gate.py` | single gate decision point: exits 1 unless **every** check scored 1.0 (the average must also clear `BENCH_THRESHOLD`) |
+| `scripts/bench-verify.sh` | runs the bench + gate and exits 1 on any weak check |
+| `.git/hooks/pre-commit` (installed by `install.sh`) | blocks a commit that stages `agents/`, `rules/`, `opencode/`, `skills/`, `scripts/`, `install.sh`, `bench/` while the gate is red |
+| `~/.config/opencode/plugins/bench-guard.js` | always-on nudge: one line in the system context when the last run was red or older than 24h |
+| `~/.config/opencode/AGENTS.md` → *Harness gate* | every agent is told to run the bench after a harness change |
+
+Current: **10/10 checks, total 1.000** (2026-10-22). Baselines and the ranked
+improvement history live in `bench/harness2-parity/BENCHMARK.md`.
 
 ## Hosts
 
@@ -120,10 +151,13 @@ One catalog: `plugins/full-cycle-delivery/scripts/lib/host-discovery.sh`.
 | **Kimi Code** | `~/.kimi-code/skills/` | `~/.kimi-code/commands/` | — |
 | **Qwen Code** | `~/.qwen/skills/` | `~/.qwen/commands/` | — |
 | **DeepSeek Harness** | `~/.dsh/skills/` and `~/.agents/skills/` | — | — |
+| **Orca** | universal `~/.agents/skills/`; aggregates every agent home (`orca skills installed`) | — | — |
 
 Agents copy to `~/.cursor/agents`, `~/.claude/agents`, `~/.agents/agents`, `~/.config/kilo/agent`; OpenCode agents sync to `~/.config/opencode/agents` via `install.sh`.
 
 Antigravity uses **real copies** (not symlinks). Re-run `bash install.sh` after plugin updates.
+
+Config mirrors kept in-repo: `opencode/rules/` (`~/.config/opencode/rules/*.md`), `opencode/plugins/orca-*` (Orca status panel plugins), `docs/agent-host-discovery/` (host-matrix ADRs), `docs/instructions/applaud-AGENTS.md` (applaud workspace DOX snapshot). Refresh these copies whenever the live files change.
 
 ## Full-cycle delivery (FCD)
 

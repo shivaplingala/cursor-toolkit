@@ -3,7 +3,7 @@ description: >-
   Read-only domain reviewer: task-specific edge cases and project-specific
   review rows (trust boundaries, idempotency, tenant isolation, channel rules,
   AGENTS.md alignment). Cheap deep-check; never edits.
-mode: all
+mode: subagent
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#00a2c7"
 permissions:

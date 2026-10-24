@@ -2,7 +2,7 @@
 description: >-
   Read-only spec reviewer: verifies the implementation matches the approved
   plan task line-by-line. PASS or a numbered FAIL list with file:line refs.
-mode: all
+mode: subagent
 model: opencode/opencode/deepseek-v4.1-flash-free#high
 color: "#058f50"
 permissions:

@@ -22,6 +22,21 @@ every situation below should end with the named skill loaded, not improvised:
 - When the user says "recall", "what did we do about", or needs past-session context → load the `recall` skill.
 - When review reports (code/spec/impact) contain findings that must be re-audited against the plan, code, and spec, or reviewers disagree → load the `verify-reviews` skill; for the agent form dispatch `fcd/reviews-verifier`.
 - When MongoDB Local/Dev/Stage queries are needed → load the `mongo-connection` skill; stage-specific → `stage-mongo`.
+- When a question is about how code works, who calls what, or what a change breaks → load the `gitnexus-exploring` or `gitnexus-impact-analysis` skill.
+- When a system needs principal-level design (APIs, data models, infra, AI frameworks, languages) → load the `staff-engineering` skill; it routes to the narrowest domain skill.
+- When a tool output, log, or JSON dump is large (roughly >2k tokens) → load the `headroom` skill to compress it before reasoning.
+- When work needs coordinated multi-agent execution, a swarm, or cross-session memory → load the `ruflo` skill.
+- When work touches an Aha! record (feature, requirement, comment, release, epic) → load the `aha-crud` skill.
+- When an Aha! comment carries a video or an image → load the `aha-video-understanding` skill.
+- When the question is about OpenCode itself (config, plugins, agents, skills, MCP, permissions) → load the `opencode` skill.
+- When resuming prior work or reconstructing context → load the `handoff`, `recap`, or `session-history` skill.
+- When a plan must become tickets or a PRD → load the `to-issues` or `to-prd` skill.
+- When creating or restructuring a skill → load the `write-a-skill` skill.
+
+## Harness gate
+
+- After any change to `~/.config/opencode/agents/`, `rules/`, `skills/`, `plugins/`, or `~/cursor-toolkit` → run `bash ~/cursor-toolkit/bench/harness2-parity/runner.sh`, then diff against the previous run with `compare.py`. A score drop means investigate against the installed OpenCode docs first — it is usually check drift, not a regression.
+- The bench is a contract test on files, not runtime behaviour: a green score never proves a plugin fires or a skill loads. Verify the runtime claim too.
 
 ## Tool guidance
 

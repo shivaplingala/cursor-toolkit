@@ -32,7 +32,15 @@ permissions:
 
 # QA → fix loop owner (main agent protocol)
 
-Canonical protocol: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/qa-fix-loop.md`
+Canonical prompt:
+`~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/qa-fix-loop.md`
+
+## Inputs the parent provides
+
+- The QA case catalog + Playwright id map for the work type
+- BASE_URL for the run (local: `http://127.0.0.1:8080`) and the run command
+- Prior round FAIL_LIST case ids and their owners
+- Waivers already granted (plan `## WAIVED` or an explicit human note)
 
 ## Goal
 

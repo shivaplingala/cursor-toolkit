@@ -1,0 +1,157 @@
+{
+  "run_ts": "2026-10-22T06:50:55Z",
+  "runner": "harness2-parity",
+  "checks": [
+    {
+      "id": "c1-systemprompt",
+      "component": "c1",
+      "desc": "always-on surface present, budgeted, and actually loaded",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "always-on payload (AGENTS.md + live rules): 10689 chars of 24000 cap (7 file(s))",
+        "opencode.json instructions -> rules/*.md: wired",
+        "agent bodies over always-on cap: none (all agents 1-4k)"
+      ]
+    },
+    {
+      "id": "c10-runtime-load",
+      "component": "c10",
+      "desc": "plugins are loaded by the opencode runtime",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "plugins seen loading in the runtime log: 3/3 e.g. bench-guard.js",
+        "plugin load errors in log: 0"
+      ]
+    },
+    {
+      "id": "c2-guardrails",
+      "component": "c2",
+      "desc": "always-on guardrails centralize process rules and are backed by gates",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "centralized Guardrails section: present",
+        "guardrail rules matched: verify-before-dispatch, read-only input rule, git safety rule, permission precedence documented",
+        "static gates: deny=61, ask=9"
+      ]
+    },
+    {
+      "id": "c3-memory",
+      "component": "c3",
+      "desc": "memory is always-on, evidence-schema'd, and wired to agents",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "Memory section in always-on: present",
+        "memory beats: index_ref=True, evidence_schema=True, closeout_cap=True",
+        "corpus INDEX exists: /home/shiva/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/knowledge/INDEX.md",
+        "agentmemory/recall reachable from config surface: 4 mentions"
+      ]
+    },
+    {
+      "id": "c4-tool-guidance",
+      "component": "c4",
+      "desc": "tool rules centralized in always-on surface, deduplicated",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "centralized Tool guidance section: present",
+        "guidance rules present: loopback-base, no-pseudo-calls, staged-deploy, retry-on-error, code-indexes",
+        "agent files still carrying duplicated loopback prose: 2"
+      ]
+    },
+    {
+      "id": "c5-subagents",
+      "component": "c5",
+      "desc": "subagent fleet share, thin orchestrator context, fenced read-only roles, self-contained briefs",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "agents=26 delegable(subagent|all)=26 (subagent=18 all=8) primary-only=0 (ratio 1.00)",
+        "orchestrators=2 thin-posture declarations=2 e.g. applaud/orchestrator.md",
+        "reviewer-named agents with deny gates: 8 e.g. code-reviewer.md",
+        "delegable briefs self-contained (canonical + inputs): 26/26 e.g. code-reviewer.md",
+        "brief canonical pointers resolve on disk: 26/26",
+        "reviewer agents selectable as primary (mode: all): 0 none"
+      ]
+    },
+    {
+      "id": "c6-skills",
+      "component": "c6",
+      "desc": "skills exist, names valid, and trigger lines advertise them",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "canonical trigger lines in always-on: 20 (/home/shiva/.config/opencode/AGENTS.md:11)",
+        "name==dir mismatches: none",
+        "descriptions consistent across mirrors: 91/91",
+        "AGENTS.md advertises native `skill` tool usage: 32 mentions"
+      ]
+    },
+    {
+      "id": "c7-scripts",
+      "component": "c7",
+      "desc": "deterministic check scripts shipped, executable, referenced",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "artifact-check.py shipped+executable: /home/shiva/cursor-toolkit/scripts/artifact-check.py",
+        "artifact-check runs on itself: yes",
+        "always-on references shipped scripts: 4 distinct fcd-doctor, runner.sh, stage_logs, verify-scope",
+        "skill/toolkit helper scripts: 4"
+      ]
+    },
+    {
+      "id": "c8-plugin",
+      "component": "c8",
+      "desc": "in-loop middleware enforcement exists and is substantive",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "plugin files: /home/shiva/.config/opencode/plugins/bench-guard.js, /home/shiva/.config/opencode/plugins/budget-guard.js, /home/shiva/.config/opencode/plugins/graphify.js",
+        "hook + cap/warn logic: 1 of 3 plugin(s)",
+        "plugins hooking the loop: 3/3 (tool: budget-guard.js, graphify.js) (session: bench-guard.js)",
+        "tool-loop hook present: yes (v2 ctx.tool.hook('execute.*'))",
+        "loadable V2 shape (default export + setup): 3 of 3 e.g. bench-guard.js",
+        "static permission gates (fallback): 70"
+      ]
+    },
+    {
+      "id": "c9-install-parity",
+      "component": "c9",
+      "desc": "toolkit source and live opencode install agree",
+      "pass": true,
+      "score": 1.0,
+      "evidence": [
+        "AGENTS.md mirror identical: yes",
+        "toolkit plugins installed live: 3/3",
+        "plugin content identical live: 3/3",
+        "toolkit rules live in opencode: 6/6",
+        "toolkit skills discoverable by opencode: 66/66"
+      ]
+    }
+  ],
+  "summary": {
+    "per_component_avg": {
+      "c1": 1.0,
+      "c10": 1.0,
+      "c2": 1.0,
+      "c3": 1.0,
+      "c4": 1.0,
+      "c5": 1.0,
+      "c6": 1.0,
+      "c7": 1.0,
+      "c8": 1.0,
+      "c9": 1.0
+    },
+    "total_score": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "n_checks": 10,
+    "failed_ids": [],
+    "skipped_ids": []
+  }
+}

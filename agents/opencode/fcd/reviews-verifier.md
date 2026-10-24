@@ -4,7 +4,7 @@ description: >-
   against the code, the plan, and the spec, re-runs impact evidence, cross-checks
   reviewers against each other, flags plan/spec mismatches. Scores reviewer
   accuracy. Never edits.
-mode: all
+mode: subagent
 model: opencode/opencode/deepseek-v4.1-flash-free#xhigh
 color: "#b8552e"
 permissions:
@@ -31,6 +31,9 @@ Audit of reviews. The coding/spec/impact reviewers each run their own findings
 self-verification pass; you are the **outside check on those passes**. You re-verify
 their findings freshly against three sources — code, plan, spec — and score their
 accuracy. You never trust a report's quote: re-open the evidence yourself.
+
+Canonical skill: `~/.cursor/skills/verify-reviews/SKILL.md`
+(context: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/SKILL.md`).
 
 ## Inputs the parent provides
 

@@ -165,3 +165,181 @@ Check-surface note: v1 checks probed harness2's fictional `plugin/`-dir surface;
 target OpenCode's real conventions (global AGENTS.md, `plugins/` dir, `instructions` key,
 `name==dir` across all 5 skill roots). Baseline intentionally unchanged; deltas compare
 old-check-B vs new-check-B because the v1 checks could not observe the new surfaces at all.
+
+---
+
+## Baseline 2026-10-22 — V2-surface-corrected checks (10 checks)
+
+Run after the OpenCode V2 port (`e2369ee` agents → `mode: all`; `f4ef9d2` plugins →
+`ctx.tool.hook("execute.after")`). The 10-18 checks graded a **V1** surface, so real
+capability scored as missing: `c5` counted only literal `mode: subagent` (0 of 26 after
+the port) and `c8` grepped for `tool.execute.after` (the V1 hook string). That produced a
+misleading 0.891 total with two false regressions.
+
+### Check changes
+
+| check | change |
+|---|---|
+| c1 | budget now measures the **total** always-on payload (global AGENTS.md + live `rules/*.md`) instead of one file: 4 436 → **8 973** of 24 000 (37%) |
+| c5 | `mode: all` counts as delegable (V2: primary **or** subagent); brief self-containment measured across the whole delegable fleet (14/26); **new** sub-condition: reviewer agents that are `mode: all` are selectable as the main session agent |
+| c6 | trigger-line count reads live rules only — the toolkit `rules/*.mdc` mirror is a Cursor surface and would double-count |
+| c8 | accepts V1 `tool.execute.*` **and** V2 `ctx.tool.hook("execute.*")`; **new** sub-condition: the plugin must expose the loadable V2 shape (default export + `setup()`) |
+| c9 | **new** — toolkit source vs live install: AGENTS.md mirror, plugin files present, plugin content, rule coverage, skill mirror |
+| c10 | **new** — the opencode server log must show each installed plugin actually loading, with no load errors |
+
+### Result (`results/bench-results-20261022-5.json`; re-run `-6` identical, `compare.py` delta 0.000)
+
+| c-# | check | pass | score | headline evidence |
+|---|---|---|---|---|
+| c1 | c1-systemprompt | ✔ | 1.000 | always-on payload 8 973 / 24 000 chars (7 files) |
+| c2 | c2-guardrails | ✔ | 1.000 | deny=61 ask=9 static gates; centralized guardrails section |
+| c3 | c3-memory | ✔ | 1.000 | corpus INDEX + evidence schema; 4 agentmemory/recall mentions |
+| c4 | c4-tool-guidance | ✔ | 1.000 | centralized tool guidance; 2 leftover duplicate loopback files |
+| c5 | c5-subagents | ✔ | 0.708 | 26/26 delegable; 14/26 self-contained briefs; **8 reviewers selectable as primary** |
+| c6 | c6-skills | ✔ | 0.875 | 13 canonical trigger lines; 0 name≠dir; 91 unique skills |
+| c7 | c7-scripts | ✔ | 0.875 | artifact-check.py shipped, executable, runs on itself |
+| c8 | c8-plugin | ✔ | 1.000 | V2 hook detected; loadable shape; 70 static gates |
+| c9 | c9-install-parity | ✔ | 0.800 | **`graphify.js` in toolkit, not installed live**; **`aha-video-understanding` missing from the opencode skills mirror** |
+| c10 | c10-runtime-load | ✔ | 1.000 | budget-guard.js seen loading; 0 load errors |
+
+10/10 pass. **TOTAL_SCORE 0.926 over 10 checks — not comparable to the 0.703 / 0.955
+baselines, which averaged 8.** Compare per check, not the total.
+
+### Real findings this baseline exposed (findings, not score regressions)
+
+1. `opencode/plugins/graphify.js` exists in the toolkit but was never copied to
+   `~/.config/opencode/plugins/` → the graphify hook never loaded. `install.sh` copies
+   that tree but was not re-run after `f4ef9d2`, and its verify step asserted only
+   `budget-guard.js` (`install.sh:129`).
+2. 8 reviewer agents were `mode: all` → each could be selected as the main session
+   agent rather than only as a child. Reviewers belong in `mode: subagent`.
+3. 12 of 26 agent briefs carry no self-containment marker (canonical prompt / inputs).
+
+Finding 2 from the first draft of this section was **wrong and is retracted**: it
+claimed `aha-video-understanding` was unavailable to OpenCode because it is missing
+from `~/.config/opencode/skills/`. OpenCode V2 also discovers `~/.claude/skills` and
+`~/.agents/skills` (global compatibility roots), where the skill is present — so it was
+loadable all along. `c9` now checks the discovery roots, not one mirror.
+
+---
+
+## Baseline 2026-10-22 (post-fix) — 10 checks, TOTAL 0.966
+
+Actions taken after the corrected baseline above, all verified by re-running the suite
+(`results/bench-results-20261022-8.json`):
+
+| action | effect |
+|---|---|
+| toolkit repo refreshed from the live owner (FCD knowledge corpus was stale: 13 vs 44 lines — a plain install would have truncated it) | no content rolled back |
+| `bash install.sh` run → `opencode/plugins/graphify.js` installed live | c9 0.800 → 1.000, c10 sees 2/2 plugins loading |
+| 9 reviewer-class agents → `mode: subagent` (toolkit source + live) | c5 0.708 → 0.908; 0 reviewers selectable as primary |
+| `agents/opencode/README.md` moved to `agents/README.md` | a doc file can no longer land in the installed agents dir as a bogus agent |
+| `install.sh --check` now asserts **every** `opencode/plugins/*` file, not just `budget-guard.js` | verified: removing `graphify.js` makes `--check` fail |
+| `c9` skill parity re-aimed at the OpenCode discovery roots | false "unavailable" finding retracted |
+
+| c-# | check | score | headline evidence |
+|---|---|---|---|
+| c5 | c5-subagents | 0.908 | 26/26 delegable (subagent=9, all=17); 0 reviewers selectable as primary; 14/26 self-contained briefs (remaining gap) |
+| c9 | c9-install-parity | 1.000 | AGENTS.md mirror identical; 2/2 plugins installed + identical; 6/6 rules; 66/66 skills discoverable |
+| c10 | c10-runtime-load | 1.000 | both plugins seen loading in the server log; 0 load errors |
+
+TOTAL_SCORE 0.966 over 10 checks (baseline before the fixes: 0.926; first 8-check
+baselines 0.703 / 0.955 — not comparable, different check count).
+
+---
+
+## Baseline 2026-10-22 (final) — 10 checks, TOTAL 1.000
+
+Every tier closed. `results/bench-results-20261022-12.json` (re-run identical).
+
+### Subagent layer (the main focus)
+
+| change | evidence |
+|---|---|
+| mode policy: **8 `all` / 18 `subagent`** — `all` reserved for the coordinators (2 orchestrators, 3 loop owners, knowledge-capture, architect pair); every worker and reviewer is dispatched-only | c5 `delegable(subagent\|all)=26`, `reviewer agents selectable as primary: 0` |
+| all **26 briefs** now carry a canonical prompt/skill line **and** an `## Inputs the parent provides` section (12 briefs were missing both) | c5 `delegable briefs self-contained: 26/26` → c5 **1.000** |
+| reviewers (`*-reviewer`, `reviews-verifier`, root `spec`/`impact`/`code-reviewer`) are no longer selectable as the main session agent | c5 sub-condition added in this baseline |
+
+### Remaining tiers
+
+| tier | change | evidence |
+| ---- | ------ | -------- |
+| always-on | +10 canonical skill trigger lines (gitnexus, staff-engineering, headroom, ruflo, aha-crud, aha-video-understanding, opencode, handoff/recap/session-history, to-issues/to-prd, write-a-skill) and a **Harness gate** section | c6 trigger lines 13 → **20**; always-on payload 8 973 → **10 689** of 24 000 (45%) |
+| enforcement | `scripts/bench-verify.sh` (gate) + `scripts/bench-gate.py` (single decision point: **every check must score exactly 1.0**, `BENCH_THRESHOLD` default 0.90 is only a floor on the average — an average threshold alone could hide a half-broken check inside a green mean, demonstrated by the gate simulation where c1=0.667 with the payload 16k over the cap still produced total 0.967 and a green exit) + `install.sh` installs a **pre-commit hook** that blocks a commit staging `agents/`, `rules/`, `opencode/`, `skills/`, `scripts/`, `install.sh`, `bench/` while the gate is red + `opencode/plugins/bench-guard.js` (always-on nudge when a check is below 1.0, the run is red, or >24h old) | gate verified red (exit 1) and green (exit 0); strict rule re-verified by the mutation test (each mutation must turn the gate red, not just dents a score); plugin verified to emit nothing when green; c10 `3/3` plugins loading, 0 errors |
+| bench metrics | c6 uniqueness now measured **per skill name across mirrors** (was a ratio of unique pairs over mirrored files → 91/384 = 0.24 against a 0.9 threshold, a denominator bug that scored real consistency as broken); c7 always-on script references counted as **distinct script names** (was lines, so two names on one line counted once) | c6 **1.000**, c7 **1.000** |
+
+### Result
+
+| c-# | check | score | headline evidence |
+|---|---|---|---|
+| c1 | c1-systemprompt | 1.000 | always-on payload 10 689 / 24 000 chars (7 files); instructions wired |
+| c2 | c2-guardrails | 1.000 | deny=61 ask=9 static gates; centralized guardrails section |
+| c3 | c3-memory | 1.000 | corpus INDEX + evidence schema; agentmemory/recall reachable |
+| c4 | c4-tool-guidance | 1.000 | centralized tool guidance; 2 leftover duplicate loopback files |
+| c5 | c5-subagents | 1.000 | 26/26 delegable (subagent=18, all=8); 0 reviewers selectable as primary; 26/26 self-contained briefs |
+| c6 | c6-skills | 1.000 | 20 trigger lines; 0 name≠dir; descriptions consistent across all mirrors |
+| c7 | c7-scripts | 1.000 | artifact-check.py shipped + runs on itself; 5 distinct scripts referenced from always-on |
+| c8 | c8-plugin | 1.000 | V2 hooks detected on all 3 plugins; loadable shape; static gates present |
+| c9 | c9-install-parity | 1.000 | AGENTS.md mirror identical; 3/3 plugins installed + identical; 6/6 rules; 66/66 skills discoverable |
+| c10 | c10-runtime-load | 1.000 | 3/3 plugins seen loading in the server log; 0 load errors |
+
+10/10 pass, **TOTAL 1.000**. A green score is a contract on files, not proof of runtime
+behaviour — the runtime claims (plugin loads, skill loads, agent dispatch) still need
+their own check.
+
+---
+
+## Mutation test (2026-10-22) — proving the bench can still fail
+
+A benchmark that cannot fail is theater. `checks/mutation-test.sh` breaks one harness
+asset at a time against the live config, asserts the matching check drops, restores
+from the toolkit source, and asserts green again.
+
+| mutation | check | result |
+| -------- | ----- | ------ |
+| reviewer agent switched back to `mode: all` | c5 | **bit** — 1.0 → 0.833 |
+| brief loses its `## Inputs the parent provides` section | c5 | **bit** — 1.0 → 0.994 |
+| brief points at a prompt file that does not exist | c5 | **bit** — 1.0 → 0.994 |
+| always-on trigger lines deleted | c6 | **bit** — 1.0 → 0.75 |
+| one plugin stops hooking the loop | c8 | **bit** — 1.0 → 0.944 |
+| a committed plugin is not installed live | c9 | **bit** — 1.0 → 0.9 |
+| always-on payload pushed past the 24k cap | c1 | **bit** — 1.0 → 0.667 |
+
+Each mutation must do **two** things to count as a pass: dent its check's score *and*
+turn the ship gate red. The second assertion exposed a separate defect after the
+mutation test passed: `pass` in the aggregate meant `score >= 0.5` and the gate only
+thresholded the *average*, so the over-cap state (c1 = 0.667, nine checks at 1.0)
+totalled 0.967 ≥ 0.90 and the gate exited **green**. `scripts/bench-gate.py` now
+requires every check to score exactly 1.0; `bench-guard.js` nudges on the same rule.
+
+Final state after the run: every check back to 1.0 and the live harness
+byte-identical to the toolkit source.
+
+**Two checks did not bite on the first run and were fixed** — that is the point of the
+test:
+
+1. `c5` accepted *either* the canonical pointer *or* the inputs section, so a brief
+   missing its inputs still scored full. It now requires **both** (and separately
+   checks that the named prompt/skill exists on disk — 26/26 resolve).
+2. `c8` passed when **any one** plugin hooked the loop, so unhooking one plugin was
+   invisible. It now scores per-plugin loop coverage (3/3 hook: 2 tool-loop,
+   1 session-hook) plus the tool-loop requirement.
+
+Known limitation, stated rather than hidden: `c10` proves a plugin was **loaded at
+least once** (server log), so it cannot detect a plugin being *removed* — the log keeps
+the old entry. Removal is `c9`'s job (install parity). The mutation test documents
+this split instead of pretending c10 covers it.
+
+### What the 1.000 does and does not mean
+
+| | |
+|---|---|
+| **does** | every harness surface the bench measures is present, wired, consistent and in parity with the toolkit source; the mutation test shows the checks detect breakage |
+| **does not** | that a skill loads when the model calls it, that a dispatched agent behaves, that the paper's own end-task metrics (+4 to +12 pts) reproduce here, or that a plugin's WARN lands in a live session — those need a behavioural test, not a file contract |
+
+Score movement decomposition since the 2026-10-18 baseline (0.956 over 8 checks →
+1.000 over 10): part is real asset work (graphify installed, 18 agents flipped to
+`subagent`, 26/26 briefs made self-contained, +10 trigger lines), part is check-surface
+correction (c5 mode semantics, c8 V2 hook detection), and part is metric-bug fixes
+(c6 denominator, c7 line-vs-name counting). Compare per check against the same check
+version; the 8-check and 10-check totals are not comparable.

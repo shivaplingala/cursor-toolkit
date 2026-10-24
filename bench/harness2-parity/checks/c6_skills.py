@@ -9,7 +9,7 @@ import benchlib as B
 def main():
     ev, score, n = [], 0.0, 0
 
-    trig, hits = B.grep_count(r"load the `\S+` skill", roots=(B.AGENTS_MD,) + B.RULES)
+    trig, hits = B.grep_count(r"load the `\S+` skill", roots=(B.AGENTS_MD,) + B.LIVE_RULES)
     score += 1.0 if trig >= 8 else (0.5 if trig >= 3 else 0.0); n += 1
     ev.append(f"canonical trigger lines in always-on: {trig} ({hits[0][0] if hits else 'none'})")
 
@@ -24,11 +24,15 @@ def main():
     score += 1.0 if not bad else 0.0; n += 1
     ev.append("name==dir mismatches: " + (", ".join(bad) or "none"))
 
-    descs = {(name, d.group(1)[:60]) for i, name, fm, body, t in B.skill_files()
-             for d in [re.search(r"^description:\s*(.+)", fm, re.M)] if d}
-    score += 1.0 if len(descs) * 1.0 / max(1, len(list(B.skill_files()))) > 0.9 else (0.5 if descs else 0.0)
+    by_name = {}
+    for i, name, fm, body, t in B.skill_files():
+        d = re.search(r"^description:\s*(.+)", fm, re.M)
+        by_name.setdefault(name, set()).add(d.group(1).strip()[:60] if d else "")
+    drift = [name for name, ds in by_name.items() if len(ds) > 1]
+    score += 1.0 if by_name and not drift else (0.5 if by_name else 0.0)
     n += 1
-    ev.append(f"description+name pairs unique: {len(descs)} over {len(list(B.skill_files()))} file(s)")
+    ev.append(f"descriptions consistent across mirrors: {len(by_name) - len(drift)}/{len(by_name)}"
+              + (f" DRIFT {drift}" if drift else ""))
 
     wires = B.grep_count(r"skill", roots=(B.AGENTS_MD,))[0]
     score += 1.0 if wires >= 5 else 0.0; n += 1

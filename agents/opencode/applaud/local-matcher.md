@@ -4,7 +4,7 @@ description: >-
   stage-deployed branch in each repo, dirty-tree stop-and-ask, boot only the
   apps the ticket needs, and deploy serverless via lsp dev-lshiva (npm run dev
   / sst dev forbidden in applaud-serverless; UI boots via npm run dev).
-mode: all
+mode: subagent
 model: opencode/opencode/nemotron-3-ultra-free#xhigh
 color: "#2dd4bf"
 permissions:
@@ -78,8 +78,14 @@ permissions:
 
 # Applaud local matcher
 
-Canonical: `~/.cursor/skills/applaud-debug/references/local.md` (verbs for applaud-cloud /
-applaud-ui-vue3 / applaud-serverless live there).
+Canonical skill: `~/.cursor/skills/applaud-debug/references/local.md` (verbs for
+applaud-cloud / applaud-ui-vue3 / applaud-serverless live there).
+
+## Inputs the parent provides
+
+- The ticket ref and the deployed branch `stage_logs.sh` printed (`BRANCH=...`)
+- Which apps the ticket needs (cloud / UI / serverless) — ask when unclear
+- The local base URL the repro spec should target
 
 ## Branch matrix
 

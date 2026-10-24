@@ -2,7 +2,7 @@
 description: >-
   Vue 3 + TypeScript frontend implementer for ui-vue3-app UI tasks: ponytail,
   read-first, verify via test:unit / test:e2e, honest verify reporting.
-mode: all
+mode: subagent
 model: opencode/opencode/nemotron-3-ultra-free#high
 color: "#84cc16"
 permissions:
@@ -25,6 +25,9 @@ permissions:
 Implement one frontend task in `ui-vue3-app` (or UI packages it owns). Load skills
 **ponytail** (full), **frontend** (`~/.cursor/skills/frontend/SKILL.md`), and
 **playwright-qa** when the task is E2E/harness.
+
+Canonical skill: `~/.cursor/skills/frontend/SKILL.md`
+(protocol: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/implementer.md`).
 
 ## Inputs the parent provides
 

@@ -38,6 +38,13 @@ permissions:
 Canonical skill: `~/.cursor/skills/applaud-debug/SKILL.md` (identical copy at
 `~/.config/opencode/skills/applaud-debug`). You coordinate; workers execute.
 
+## Inputs the parent provides
+
+- The Aha ticket ref / URL for the bug being debugged
+- What is already known: has stage reproduction been checked, and by whom
+- Which repos/apps the symptom touches (cloud / UI / serverless) — ask when unclear
+- Constraints the human imposed (deadline, branch, do-not-touch paths)
+
 ## Order (non-negotiable)
 
 1. **Ticket first** — `applaud/ticket-reader` before any theory or hypothesis.

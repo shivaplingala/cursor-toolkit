@@ -25,7 +25,33 @@ AGENTS_MD = os.path.join(CF, "AGENTS.md")            # global always-on rules fi
 FCD = os.path.join(HOME, ".cursor/plugins/local/full-cycle-delivery/"
                    "skills/full-cycle-delivery")
 RULES = (os.path.join(CF, "rules"), os.path.join(TK, "rules"))
+LIVE_RULES = (os.path.join(CF, "rules"),)            # the rules OpenCode actually loads
+TOOLKIT_OC = os.path.join(TK, "opencode")            # toolkit source of the opencode mirror
+LIVE_SKILLS = os.path.join(CF, "skills")             # opencode skill mirror
+# OpenCode V2 discovery: ~/.config/opencode/skills + global compatibility roots.
+OPENCODE_SKILL_ROOTS = (
+    os.path.join(CF, "skills"),
+    os.path.join(HOME, ".claude/skills"),
+    os.path.join(HOME, ".agents/skills"),
+)
+LOG = os.path.join(HOME, ".local/share/opencode/log/opencode.log")
 ALWAYS_ON_MAX = 24_000  # harness2 OPENCODE_SURFACE.always_on_max
+
+
+def always_on_paths():
+    """Files OpenCode actually loads always-on: global AGENTS.md + live rules/*.md.
+
+    The toolkit rules/ mirror is a Cursor-flavored (.mdc) source copy, not a
+    second always-on surface, so it is excluded here on purpose.
+    """
+    out = []
+    if os.path.isfile(AGENTS_MD):
+        out.append(AGENTS_MD)
+    for root in LIVE_RULES:
+        if os.path.isdir(root):
+            out += [os.path.join(root, f) for f in sorted(os.listdir(root))
+                    if f.endswith(".md")]
+    return out
 
 
 def fm_body(text):

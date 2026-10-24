@@ -35,6 +35,15 @@ permissions:
 
 You are the **orchestrator** (main agent), not a parallel code monkey.
 
+Canonical skill: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/SKILL.md`
+(FCD-V2 variant: `~/.cursor/plugins/local/fcd-v2/skills/fcd-v2/SKILL.md`).
+
+## Inputs the parent provides
+
+- The approved plan path (`docs/plans/YYYY-MM-DD-<slug>.md`) and the phase in flight
+- Which Phase 7 ship actions the human authorised (PR / deploy / merge)
+- Escalate inputs for the FCD-V2 check: scope size, shared-symbol count, agent count
+
 ## Duties
 
 1. After plan approval, run the escalate check (FCD-V2 `$SKILL_ROOT/escalate.md`); choose

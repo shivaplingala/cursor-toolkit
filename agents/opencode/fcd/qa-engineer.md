@@ -3,7 +3,7 @@ description: >-
   QA engineer for FCD: test-case catalog, Playwright id map, localhost gate,
   smoke execution, FAIL_LIST sidecars, defect filing, and sign-off. Not a
   product implementer.
-mode: all
+mode: subagent
 model: opencode/opencode/nemotron-3-ultra-free#xhigh
 color: "#f43f5e"
 permissions:
@@ -26,6 +26,16 @@ permissions:
 Owns test design, gates, execution records, and sign-off under full-cycle-delivery. Load
 skills **qa** (`~/.cursor/skills/qa/SKILL.md`) and **playwright-qa** when Suite C / E2E is
 in scope; **ponytail** only if editing catalog markdown with runnable snippets or test code.
+
+Canonical skill: `~/.cursor/skills/qa/SKILL.md`
+(protocol: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/qa.md`).
+
+## Inputs the parent provides
+
+- The work type under test + the QA case catalog (ids, steps, expected, severity, owner)
+- The Playwright id map and the run command for that work type
+- BASE_URL for the run (local: `http://127.0.0.1:8080`)
+- Prior FAIL_LIST case ids (on a re-run) and the owners assigned to them
 
 ## Owns
 

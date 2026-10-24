@@ -18,11 +18,26 @@ def main():
     ev.append("plugin files: " + (", ".join(plugs) or "missing"))
 
     hooked = False
+    shape = "none"
     substance = 0
+    shaped = []
+    tool_hooks, loop_hooks = [], []
     for p in plugs:
         t = open(p, encoding="utf-8", errors="replace").read()
+        # V1 hook: returned "tool.execute.after" key. V2 hook: ctx.tool.hook("execute.after").
         if re.search(r"tool\.execute\.(after|before)", t):
             hooked = True
+            shape = "v1 tool.execute.*"
+            tool_hooks.append(os.path.basename(p))
+        elif re.search(r"\.hook\(\s*[\"']execute\.(after|before)[\"']", t):
+            hooked = True
+            shape = "v2 ctx.tool.hook('execute.*')"
+            tool_hooks.append(os.path.basename(p))
+        elif re.search(r"\.hook\(\s*[\"']", t):
+            loop_hooks.append(os.path.basename(p))
+        # OpenCode V2 loads a default export exposing id + setup(); anything else is a no-op.
+        if re.search(r"export\s+default", t) and re.search(r"\bsetup\s*\(", t):
+            shaped.append(os.path.basename(p))
         hits = sum(bool(re.search(rx, t)) for rx in
                    (r"%\s*(===|>=)\s*\d+", r"WARN|budget|retry-loop", r"error.*signature|sig", r"sessionID"))
         if hits >= 2:
@@ -30,8 +45,18 @@ def main():
     score += 1.0 if plugged_against_real_api(substance) else 0.0; n += 1
     ev.append(f"hook + cap/warn logic: {substance} of {len(plugs)} plugin(s)")
 
+    every_hooked = len(tool_hooks) + len(loop_hooks)
+    score += (every_hooked / len(plugs)) if plugs else 0.0; n += 1
+    ev.append(f"plugins hooking the loop: {every_hooked}/{len(plugs)}"
+              + (f" (tool: {', '.join(tool_hooks) or 'none'})" if tool_hooks else "")
+              + (f" (session: {', '.join(loop_hooks)})" if loop_hooks else ""))
+
     score += 1.0 if hooked else 0.0; n += 1
-    ev.append("tool-loop hook present: " + ("yes" if hooked else "no"))
+    ev.append("tool-loop hook present: " + (f"yes ({shape})" if hooked else "no"))
+
+    score += 1.0 if len(shaped) == len(plugs) and plugs else 0.0; n += 1
+    ev.append(f"loadable V2 shape (default export + setup): {len(shaped)} of {len(plugs)}"
+              + (f" e.g. {shaped[0]}" if shaped else ""))
 
     gates = 0
     for _rel, fm, _body in B.iter_agents():

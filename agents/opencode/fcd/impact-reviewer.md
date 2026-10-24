@@ -3,7 +3,7 @@ description: >-
   Read-only full-codebase impact review of a change set OR a Phase 3 planned
   file list (MODE=PLAN) using GitNexus and graphify together. Reports blast
   radius and findings; never edits code.
-mode: all
+mode: subagent
 model: opencode/opencode/deepseek-v4.1-flash-free#max
 color: "#f5a524"
 permissions:

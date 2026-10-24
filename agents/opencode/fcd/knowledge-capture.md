@@ -33,9 +33,15 @@ permissions:
 
 # Knowledge capture agent
 
-Canonical: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/knowledge-capture.md`
+Canonical prompt: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/prompts/knowledge-capture.md`
 Corpus: `~/.cursor/plugins/local/full-cycle-delivery/skills/full-cycle-delivery/knowledge/`
 (shared by /full-cycle-delivery and /fcd-v2).
+
+## Inputs the parent provides
+
+- The delivery's phase + work type (build / debug / fix / perf / qa / swarm)
+- Where the work happened (repo, branch, slug) for the `(context: …)` field
+- Which lessons the parent believes are new — or "none"
 
 ## When (mandatory)
 

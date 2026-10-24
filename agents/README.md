@@ -14,9 +14,35 @@ The Markdown body is the system prompt.
 | `applaud/` (6) | applaud-debug pipeline — orchestrator, ticket-reader, stage-repro, local-matcher, fixer, repro-runner |
 | root (3) | standalone reviewers: `spec-reviewer`, `code-reviewer`, `impact-reviewer` |
 
-Worker agents are `mode: subagent` on purpose: pick an `all`-mode coordinator
-(`fcd/orchestrator`, `applaud/orchestrator`, the loops, or the standalone reviewers) as the
-session agent and it dispatches workers with fresh context.
+## Mode policy
+
+`mode: subagent` = dispatched only (fresh child context, never selectable as the
+session agent). `mode: all` = selectable as the session agent **and** dispatchable
+as a subagent. Current fleet: **8 `all` / 18 `subagent`**.
+
+`mode: all` is reserved for the 8 coordinators — the session-agent entry points:
+
+| `mode: all` | Role |
+| ------------ | ---- |
+| `fcd/orchestrator`, `applaud/orchestrator` | delivery orchestrators |
+| `fcd/plan-review-fix-loop`, `fcd/qa-fix-loop`, `fcd/review-fix-loop` | loop owners |
+| `fcd/knowledge-capture` | corpus writer |
+| `fcd/architect`, `fcd/backend-architect` | Phase 2 design pair |
+
+Everything else is `mode: subagent`: workers (`fcd/implementer`,
+`fcd/backend-implementer`, `fcd/frontend-implementer`, `fcd/qa-engineer`,
+`applaud/ticket-reader`, `applaud/stage-repro`, `applaud/local-matcher`,
+`applaud/fixer`, `applaud/repro-runner`) and every reviewer/auditor
+(`*-reviewer`, `reviews-verifier`, `spec-reviewer`, `impact-reviewer`,
+`code-reviewer`). A read-only auditor must never be selectable as the main
+session agent. `bench/harness2-parity/checks/c5_subagents.py` fails the build if a
+reviewer-class agent is `mode: all`.
+
+## Brief contract
+
+Every body names its canonical prompt/skill and an **Inputs the parent provides**
+section, so a child session with fresh context can act without the parent's
+transcript. `c5` scores that marker on all 26 briefs.
 
 ## Free-model policy
 

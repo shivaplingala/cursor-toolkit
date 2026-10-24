@@ -11,6 +11,11 @@ RULES="${CURSOR_RULES:-$HOME/.cursor/rules}"
 CURSOR_AGENTS="${CURSOR_AGENTS:-$HOME/.cursor/agents}"
 AGENTS="${OPENCODE_AGENTS:-$HOME/.config/opencode/agents}"
 
+HD_LIB="$ROOT/plugins/full-cycle-delivery/scripts/lib/host-discovery.sh"
+[[ -f "$HD_LIB" ]] || HD_LIB="$HOME/.cursor/plugins/local/full-cycle-delivery/scripts/lib/host-discovery.sh"
+# shellcheck source=/dev/null
+source "$HD_LIB"
+
 PLUGINS=(aws-diagnose fcd-v2 full-cycle-delivery global-tooling staff-engineering)
 
 sync_tree() {
@@ -58,6 +63,7 @@ install_skills() {
     dest="$SKILLS/$name"
     if [[ -L "$dest" ]]; then rm -f "$dest"; fi
     sync_tree "$src" "$dest"
+    hd_link_skill "$dest" "$HOME/.agents/skills/$name"
     echo "skill   $dest"
   done
   shopt -u nullglob
@@ -83,13 +89,33 @@ install_agents() {
   [[ -f "$oc/AGENTS.md" ]] && cp -R "$oc/AGENTS.md" "$home/AGENTS.md" && echo "agents  $home/AGENTS.md"
   if [[ -d "$oc/plugins" ]]; then
     mkdir -p "$home/plugins"
-    cp -R "$oc/plugins/." "$home/plugins/"
+    sync_tree "$oc/plugins" "$home/plugins/"
     echo "agents  $home/plugins/"
   fi
   if [[ -d "$ROOT/agents/cursor" ]]; then
     sync_tree "$ROOT/agents/cursor" "$CURSOR_AGENTS"
     echo "agents  $CURSOR_AGENTS"
   fi
+}
+
+install_hooks() {
+  # pre-commit gate: a commit that touches the harness surfaces must keep the bench green
+  local hook="$ROOT/.git/hooks/pre-commit"
+  [[ -d "$ROOT/.git" ]] || return 0
+  mkdir -p "$(dirname "$hook")"
+  cat > "$hook" <<'EOF'
+#!/usr/bin/env bash
+# harness2-parity gate (installed by cursor-toolkit install.sh)
+set -uo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+[[ -x "$ROOT/scripts/bench-verify.sh" ]] || exit 0
+if git diff --cached --name-only | grep -qE '^(agents/|rules/|opencode/|skills/|scripts/|install.sh|bench/)'; then
+  bash "$ROOT/scripts/bench-verify.sh" || exit 1
+fi
+exit 0
+EOF
+  chmod +x "$hook"
+  echo "hook    $hook"
 }
 
 run_host_installers() {
@@ -126,9 +152,15 @@ check_install() {
     echo "FAIL opencode agents"; ok=1;
   }
   local ocd="$(dirname "$AGENTS")"
-  [[ -f "$ocd/AGENTS.md" && -f "$ocd/plugins/budget-guard.js" ]] || {
-    echo "FAIL opencode AGENTS.md/plugin"; ok=1;
-  }
+  [[ -f "$ocd/AGENTS.md" ]] || { echo "FAIL opencode AGENTS.md"; ok=1; }
+  # every plugin in the toolkit source must be installed live, else it never loads
+  local p
+  for p in "$ROOT/opencode/plugins/"*.js "$ROOT/opencode/plugins/"*.ts; do
+    [[ -f "$p" ]] || continue
+    [[ -f "$ocd/plugins/$(basename "$p")" ]] || {
+      echo "FAIL opencode plugin not installed: $(basename "$p")"; ok=1;
+    }
+  done
   [[ -f "$RULES/headroom.mdc" || -f "$RULES/cursor-global-tooling.mdc" ]] || {
     echo "WARN rules may be incomplete"
   }
@@ -180,6 +212,7 @@ case "${1:-}" in
     install_skills
     install_rules
     install_agents
+    install_hooks
     run_host_installers
     bash "$ROOT/scripts/install-applaud-debug.sh"
     echo

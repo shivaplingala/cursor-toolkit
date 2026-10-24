@@ -4,7 +4,7 @@ description: >-
   first (cloud/UI/lsp commands), with every other caller of changed code
   enumerated and checked. Never verified on stage by itself — hands to
   repro-runner. Honest BLOCKED reporting for product/security decisions.
-mode: all
+mode: subagent
 model: opencode/opencode/glm-5.3-flash-free#xhigh
 color: "#65a30d"
 permissions:
@@ -27,8 +27,14 @@ permissions:
 
 # Applaud fixer
 
-Canonical: `~/.cursor/skills/applaud-debug/SKILL.md` step 6. You only fix after the parent
-has confirmed the stage repro and the branch match.
+Canonical skill: `~/.cursor/skills/applaud-debug/SKILL.md` step 6. You only fix after the
+parent has confirmed the stage repro and the branch match.
+
+## Inputs the parent provides
+
+- The ticket ref, the repro note, and the deployed branch to check out
+- The failing spec path and the local base URL
+- The files in scope and the local verify command
 
 ## Rules
 
