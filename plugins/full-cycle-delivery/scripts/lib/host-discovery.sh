@@ -163,7 +163,9 @@ hd_check_rule_dual() {
   return $rc
 }
 
-# Dest must resolve to the same tree as src (symlink OR the canonical directory itself).
+# Dest must resolve to the same tree as src (symlink OR the canonical directory itself),
+# or hold a content-identical copy of it (install.sh stages repo -> ~/.cursor/plugins/local
+# and relinks hosts to the staged copy; both entrances must verify green).
 hd_check_skill_link() {
   local src="$1"
   local dest="$2"
@@ -172,6 +174,11 @@ hd_check_skill_link() {
   dest_r="$(readlink -f "$dest" 2>/dev/null || true)"
   if [[ -n "$dest_r" && "$dest_r" == "$src_r" ]]; then
     echo "CHECK ok   link $dest"
+    return 0
+  fi
+  if [[ -d "$dest" ]] \
+    && diff -rq -x 'graphify-out' -x '*.Zone.Identifier' "$src" "$dest" >/dev/null 2>&1; then
+    echo "CHECK ok   link $dest (equal copy)"
     return 0
   fi
   if [[ -d "$dest" && ! -L "$dest" ]]; then
